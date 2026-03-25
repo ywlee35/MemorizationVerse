@@ -745,7 +745,7 @@ function renderContent() {
                     <div class="card-meta">
                         <span class="verse-ref">${v.ref}</span>
                     </div>
-                    <button class="card-play-btn" id="cpbtn-${i}" aria-label="${i+1}절 재생">▶</button>
+                    <button class="card-play-btn" id="cpbtn-${i}" aria-label="${i+1}절 재생"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg></button>
                 </div>
                 <div class="verse-text">${v.text}</div>
             </div>
@@ -775,7 +775,9 @@ function setCardPlaying(verseIdx) {
         if (!card) continue;
         const active = (i === verseIdx) && isPlaying;
         card.classList.toggle('playing', active);
-        if (btn) btn.textContent = active ? '⏸' : '▶';
+        if (btn) btn.innerHTML = active
+            ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1.5"/><rect x="15" y="3" width="4" height="18" rx="1.5"/></svg>`
+            : `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>`;
     }
 }
 
