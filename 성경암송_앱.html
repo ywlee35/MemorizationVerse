@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>성경 암송</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        html, body { height: 100%; overflow: hidden; }
+        
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: -webkit-fill-available;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            padding: 16px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e8d5b7;
+            text-align: center;
+        }
+        
+        .week-tabs {
+            display: flex;
+            overflow-x: auto;
+            padding: 12px 16px;
+            gap: 8px;
+            background: rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .week-tabs::-webkit-scrollbar { display: none; }
+        
+        .week-tab {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: #8b9dc3;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .week-tab.active {
+            background: #e8d5b7;
+            color: #1a1a2e;
+            border-color: #e8d5b7;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .theme-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(232, 213, 183, 0.15);
+            border-radius: 20px;
+            color: #e8d5b7;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        
+        .verse-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .verse-ref {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e8d5b7;
+            margin-bottom: 12px;
+        }
+        
+        .verse-text {
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #e0e6ef;
+            word-break: keep-all;
+        }
+        
+        .player {
+            background: rgba(0,0,0,0.4);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 20px;
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+            flex-shrink: 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #e8d5b7;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #8b9dc3;
+            margin-bottom: 16px;
+        }
+        
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .ctrl-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        
+        .ctrl-btn:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .ctrl-btn.play {
+            width: 70px;
+            height: 70px;
+            background: #e8d5b7;
+            color: #1a1a2e;
+            font-size: 1.8rem;
+        }
+        
+        .ctrl-btn.play:active { background: #d4c4a8; }
+        
+        .repeat-info {
+            position: relative;
+        }
+        
+        .repeat-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e8d5b7;
+            color: #1a1a2e;
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status-text {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #8b9dc3;
+            margin-top: 14px;
+        }
+        
+        .status-text.playing { color: #81c784; }
+        .status-text.error { color: #ef5350; }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .modal-overlay.show { display: flex; }
+        
+        .modal {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 24px;
+            width: 280px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .modal h3 {
+            color: #e8d5b7;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .repeat-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .repeat-opt {
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .repeat-opt.selected {
+            background: #e8d5b7;
+            color: #1a1a2e;
+            border-color: #e8d5b7;
+        }
+        
+        .modal-close {
+            width: 100%;
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .speed-text { font-size: 0.8rem !important; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>📖 성경 암송</h1>
+        </div>
+        
+        <div class="week-tabs" id="weekTabs"></div>
+        
+        <div class="content" id="content"></div>
+        
+        <div class="player">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-info">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime">0:00</span>
+            </div>
+            <div class="controls">
+                <button class="ctrl-btn speed-text" id="speedBtn" aria-label="재생 속도">1x</button>
+                <button class="ctrl-btn" id="prevBtn" aria-label="이전 주차">⏮</button>
+                <button class="ctrl-btn play" id="playBtn" aria-label="재생">▶</button>
+                <button class="ctrl-btn" id="nextBtn" aria-label="다음 주차">⏭</button>
+                <div class="repeat-info">
+                    <button class="ctrl-btn" id="repeatBtn" aria-label="반복 설정">🔁</button>
+                    <span class="repeat-badge" id="repeatBadge">3</span>
+                </div>
+            </div>
+            <div class="status-text" id="status">주차를 선택하고 재생하세요</div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="repeatModal">
+        <div class="modal">
+            <h3>반복 횟수 선택</h3>
+            <div class="repeat-options">
+                <button class="repeat-opt" data-val="1">1회</button>
+                <button class="repeat-opt" data-val="2">2회</button>
+                <button class="repeat-opt selected" data-val="3">3회</button>
+                <button class="repeat-opt" data-val="5">5회</button>
+                <button class="repeat-opt" data-val="7">7회</button>
+                <button class="repeat-opt" data-val="10">10회</button>
+            </div>
+            <button class="modal-close" id="modalClose">확인</button>
+        </div>
+    </div>
+
+    <script>
+        // 성경 암송 데이터
+        const weeks = [
+            {
+                theme: "중심되신 그리스도",
+                verses: [
+                    { ref: "갈라디아서 2:20", text: "내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 사는 것이 아니요 오직 내 안에 그리스도께서 사시는 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 자신을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라" },
+                    { ref: "요한복음 15:5", text: "나는 포도나무요 너희는 가지라 그가 내 안에, 내가 그 안에 거하면 사람이 열매를 많이 맺나니 나를 떠나서는 너희가 아무 것도 할 수 없음이라" }
+                ]
+            },
+            {
+                theme: "구원의 확신",
+                verses: [
+                    { ref: "요한일서 5:13", text: "내가 하나님의 아들의 이름을 믿는 너희에게 이것을 쓰는 것은 너희로 하여금 너희에게 영생이 있음을 알게 하려 함이라" },
+                    { ref: "요한복음 5:24", text: "내가 진실로 진실로 너희에게 이르노니 내 말을 듣고 또 나를 보내신 이를 믿는 자는 영생을 얻었고 심판에 이르지 아니하나니 사망에서 생명으로 옮겼느니라" }
+                ]
+            },
+            {
+                theme: "하나님의 속성",
+                verses: [
+                    { ref: "역대상 29:11", text: "여호와여 위대하심과 권능과 영광과 승리와 위엄이 다 주께 속하였사오니 천지에 있는 것이 다 주의 것이로소이다 여호와여 주권도 주께 속하였사오니 주는 높으사 만물의 머리이심이니이다" },
+                    { ref: "시편 36:5-6", text: "여호와여 주의 인자하심이 하늘에 있고 주의 진실하심이 공중에 사무쳤으며 주의 의는 하나님의 산들과 같고 주의 심판은 큰 바다와 같으니이다 여호와여 주는 사람과 짐승을 구하여 주시나이다" }
+                ]
+            },
+            {
+                theme: "성경",
+                verses: [
+                    { ref: "디모데후서 3:16-17", text: "모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니 이는 하나님의 사람으로 온전하게 하며 모든 선한 일을 행할 능력을 갖추게 하려 함이라" },
+                    { ref: "베드로전서 2:2", text: "갓난 아기들 같이 순전하고 신령한 젖을 사모하라 이는 그로 말미암아 너희로 구원에 이르도록 자라게 하려 함이라" }
+                ]
+            },
+            {
+                theme: "기도",
+                verses: [
+                    { ref: "요한복음 15:7", text: "너희가 내 안에 거하고 내 말이 너희 안에 거하면 무엇이든지 원하는 대로 구하라 그리하면 이루리라" },
+                    { ref: "빌립보서 4:6-7", text: "아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라" }
+                ]
+            },
+            {
+                theme: "교제",
+                verses: [
+                    { ref: "로마서 12:4-5", text: "우리가 한 몸에 많은 지체를 가졌으나 모든 지체가 같은 기능을 가진 것이 아니니 이와 같이 우리 많은 사람이 그리스도 안에서 한 몸이 되어 서로 지체가 되었느니라" },
+                    { ref: "요한복음 13:34-35", text: "새 계명을 너희에게 주노니 서로 사랑하라 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라 너희가 서로 사랑하면 이로써 모든 사람이 너희가 내 제자인 줄 알리라" }
+                ]
+            },
+            {
+                theme: "전도",
+                verses: [
+                    { ref: "로마서 1:16", text: "내가 복음을 부끄러워하지 아니하노니 이 복음은 모든 믿는 자에게 구원을 주시는 하나님의 능력이 됨이라 먼저는 유대인에게요 그리고 헬라인에게로다" },
+                    { ref: "베드로전서 3:15", text: "너희 마음에 그리스도를 주로 삼아 거룩하게 하고 너희 속에 있는 소망에 관한 이유를 묻는 자에게는 대답할 것을 항상 준비하되 온유와 두려움으로 하고" }
+                ]
+            },
+            {
+                theme: "성령충만한 삶",
+                verses: [
+                    { ref: "에베소서 5:18", text: "술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라" },
+                    { ref: "갈라디아서 5:22-23", text: "오직 성령의 열매는 사랑과 희락과 화평과 오래 참음과 자비와 양선과 충성과 온유와 절제니 이같은 것을 금지할 법이 없느니라" }
+                ]
+            },
+            {
+                theme: "시험을 이기는 삶",
+                verses: [
+                    { ref: "고린도전서 10:13", text: "사람이 감당할 시험 밖에는 너희가 당한 것이 없나니 오직 미쁘사 너희가 감당하지 못할 시험 당함을 허락하지 아니하시고 시험 당할 즈음에 또한 피할 길을 내사 너희로 능히 감당하게 하시느니라" },
+                    { ref: "야고보서 1:14-15", text: "오직 각 사람이 시험을 받는 것은 자기 욕심에 끌려 미혹됨이니 욕심이 잉태한즉 죄를 낳고 죄가 장성한즉 사망을 낳느니라" }
+                ]
+            },
+            {
+                theme: "순종하는 삶",
+                verses: [
+                    { ref: "로마서 12:1", text: "그러므로 형제들아 내가 하나님의 모든 자비하심으로 너희를 권하노니 너희 몸을 하나님이 기뻐하시는 거룩한 산 제물로 드리라 이는 너희가 드릴 영적 예배니라" },
+                    { ref: "누가복음 9:23", text: "또 무리에게 이르시되 아무든지 나를 따라오려거든 자기를 부인하고 날마다 제 십자가를 지고 나를 따를 것이니라" }
+                ]
+            },
+            {
+                theme: "사역하는 삶",
+                verses: [
+                    { ref: "베드로전서 2:9", text: "그러나 너희는 택하신 족속이요 왕 같은 제사장들이요 거룩한 나라요 그의 소유가 된 백성이니 이는 너희를 어두운데서 불러 내어 그의 기이한 빛에 들어가게 하신 이의 아름다운 덕을 선포하게 하려 하심이라" },
+                    { ref: "고린도전서 3:9", text: "우리는 하나님의 동역자들이요 너희는 하나님의 밭이요 하나님의 집이니라" }
+                ]
+            }
+        ];
+
+        // 상태 변수
+        let currentWeek = 0;
+        let isPlaying = false;
+        let audio = null;
+        let repeatCount = 3;
+        let currentRepeat = 0;
+        let speedIndex = 0;
+        let speeds = [1, 1.25, 1.5, 2];
+
+        // DOM 요소
+        const weekTabs = document.getElementById('weekTabs');
+        const contentEl = document.getElementById('content');
+        const playBtn = document.getElementById('playBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const speedBtn = document.getElementById('speedBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+        const repeatBadge = document.getElementById('repeatBadge');
+        const statusEl = document.getElementById('status');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+        const repeatModal = document.getElementById('repeatModal');
+        const modalClose = document.getElementById('modalClose');
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function renderWeekTabs() {
+            weekTabs.innerHTML = '';
+            weeks.forEach((week, idx) => {
+                const tab = document.createElement('button');
+                tab.className = `week-tab ${idx === 0 ? 'active' : ''}`;
+                tab.dataset.week = idx;
+                tab.textContent = `${idx + 1}주차`;
+                weekTabs.appendChild(tab);
+            });
+        }
+
+        function renderContent() {
+            const week = weeks[currentWeek];
+            contentEl.innerHTML = `
+                <div class="theme-badge">${week.theme}</div>
+                ${week.verses.map(verse => `
+                    <div class="verse-card">
+                        <div class="verse-ref">${verse.ref}</div>
+                        <div class="verse-text">${verse.text}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function updateTabActive() {
+            document.querySelectorAll('.week-tab').forEach((tab, idx) => {
+                tab.classList.toggle('active', idx === currentWeek);
+            });
+        }
+
+        function selectWeek(weekNum) {
+            currentWeek = weekNum;
+            updateTabActive();
+            renderContent();
+            currentRepeat = 0;
+            
+            // 음성 파일 로드
+            const audioSrc = `${String(currentWeek + 1).padStart(2, '0')}.mp3`;
+            loadAudio(audioSrc);
+            statusEl.textContent = `${currentWeek + 1}주차 준비 완료`;
+            statusEl.className = 'status-text';
+        }
+
+        function loadAudio(src) {
+            if (audio) {
+                audio.pause();
+                audio.src = '';
+            }
+            
+            audio = new Audio();
+            audio.src = src;
+            
+            audio.addEventListener('loadedmetadata', () => {
+                totalTimeEl.textContent = formatTime(audio.duration);
+            });
+
+            audio.addEventListener('timeupdate', () => {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                progressFill.style.width = progress + '%';
+                currentTimeEl.textContent = formatTime(audio.currentTime);
+            });
+
+            audio.addEventListener('ended', () => {
+                if (currentRepeat < repeatCount) {
+                    currentRepeat++;
+                    audio.currentTime = 0;
+                    audio.play().catch(e => {
+                        statusEl.textContent = '❌ 재생 실패: ' + e.message;
+                        statusEl.className = 'status-text error';
+                    });
+                    updateStatus();
+                } else {
+                    isPlaying = false;
+                    playBtn.textContent = '▶';
+                    statusEl.textContent = '✅ 반복 완료';
+                    statusEl.className = 'status-text';
+                }
+            });
+
+            audio.addEventListener('error', () => {
+                statusEl.textContent = '❌ 음성 파일을 불러올 수 없습니다';
+                statusEl.className = 'status-text error';
+            });
+        }
+
+        function updateStatus() {
+            statusEl.textContent = `🎵 ${currentWeek + 1}주차 재생 중 (${currentRepeat}/${repeatCount}회)`;
+            statusEl.className = 'status-text playing';
+        }
+
+        function togglePlay() {
+            if (!audio) return;
+            
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                playBtn.textContent = '▶';
+                statusEl.textContent = '⏸ 일시정지됨';
+                statusEl.className = 'status-text';
+            } else {
+                if (currentRepeat === 0) currentRepeat = 1;
+                audio.play().then(() => {
+                    isPlaying = true;
+                    playBtn.textContent = '⏸';
+                    updateStatus();
+                }).catch(e => {
+                    statusEl.textContent = '❌ 재생 실패: ' + e.message;
+                    statusEl.className = 'status-text error';
+                });
+            }
+        }
+
+        function setupEvents() {
+            weekTabs.addEventListener('click', (e) => {
+                if (e.target.classList.contains('week-tab')) {
+                    if (isPlaying && audio) {
+                        audio.pause();
+                        isPlaying = false;
+                        playBtn.textContent = '▶';
+                    }
+                    selectWeek(parseInt(e.target.dataset.week));
+                }
+            });
+
+            playBtn.addEventListener('click', togglePlay);
+
+            prevBtn.addEventListener('click', () => {
+                if (currentWeek > 0) {
+                    if (audio) audio.pause();
+                    isPlaying = false;
+                    playBtn.textContent = '▶';
+                    selectWeek(currentWeek - 1);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentWeek < weeks.length - 1) {
+                    if (audio) audio.pause();
+                    isPlaying = false;
+                    playBtn.textContent = '▶';
+                    selectWeek(currentWeek + 1);
+                }
+            });
+
+            speedBtn.addEventListener('click', () => {
+                speedIndex = (speedIndex + 1) % speeds.length;
+                if (audio) audio.playbackRate = speeds[speedIndex];
+                speedBtn.textContent = speeds[speedIndex] === 1 ? '1x' : speeds[speedIndex] + 'x';
+            });
+
+            repeatBtn.addEventListener('click', () => {
+                repeatModal.classList.add('show');
+            });
+
+            repeatModal.addEventListener('click', (e) => {
+                if (e.target === repeatModal) repeatModal.classList.remove('show');
+            });
+
+            modalClose.addEventListener('click', () => {
+                repeatModal.classList.remove('show');
+            });
+
+            document.querySelectorAll('.repeat-opt').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.repeat-opt').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    repeatCount = parseInt(btn.dataset.val);
+                    repeatBadge.textContent = repeatCount;
+                    currentRepeat = 0;
+                });
+            });
+
+            progressBar.addEventListener('click', (e) => {
+                if (!audio) return;
+                const rect = progressBar.getBoundingClientRect();
+                const pct = (e.clientX - rect.left) / rect.width;
+                audio.currentTime = pct * audio.duration;
+            });
+        }
+
+        function init() {
+            renderWeekTabs();
+            selectWeek(0);
+            setupEvents();
+        }
+
+        // 페이지 로드 시 초기화
+        init();
+    </script>
+</body>
+</html>
