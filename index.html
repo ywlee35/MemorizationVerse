@@ -3,631 +3,976 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>성경 암송</title>
+    <title>새일꾼반 성경암송</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        html, body { height: 100%; overflow: hidden; }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg:            #07090f;
+            --bg2:           #0c1020;
+            --bg3:           #111830;
+            --surface:       rgba(255,255,255,0.04);
+            --surface2:      rgba(255,255,255,0.07);
+            --border:        rgba(255,255,255,0.07);
+            --border2:       rgba(255,255,255,0.12);
+            --accent:        #f2c46c;
+            --accent-soft:   rgba(242,196,108,0.12);
+            --accent-border: rgba(242,196,108,0.28);
+            --accent-glow:   rgba(242,196,108,0.18);
+            --text1:         #edf0f8;
+            --text2:         #8898b8;
+            --text3:         #4a5a78;
+            --green:         #6ec87a;
+            --red:           #e07070;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html,body { height:100%; overflow:hidden; }
+
         body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-            color: #fff;
+            font-family: 'Noto Sans KR', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text1);
             min-height: 100vh;
             min-height: -webkit-fill-available;
         }
-        
-        .app-container {
+
+        /* ── App Shell ─────────────────────────────── */
+        .app {
             display: flex;
             flex-direction: column;
             height: 100vh;
             height: -webkit-fill-available;
-            max-width: 500px;
+            max-width: 520px;
             margin: 0 auto;
         }
-        
+
+        /* ── Header ────────────────────────────────── */
         .header {
-            padding: 16px 20px;
-            background: rgba(0,0,0,0.3);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
-        }
-        
-        .header h1 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #e8d5b7;
+            padding: 16px 20px 12px;
+            background: rgba(7,9,15,0.9);
+            border-bottom: 1px solid var(--border);
             text-align: center;
+            backdrop-filter: blur(10px);
         }
-        
+        .header-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            color: var(--accent);
+            opacity: 0.75;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+        .header h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text1);
+            letter-spacing: -0.02em;
+        }
+
+        /* ── Week Tabs ──────────────────────────────── */
         .week-tabs {
+            flex-shrink: 0;
             display: flex;
             overflow-x: auto;
-            padding: 12px 16px;
-            gap: 8px;
-            background: rgba(0,0,0,0.2);
-            flex-shrink: 0;
+            padding: 10px 14px;
+            gap: 6px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
-        
-        .week-tabs::-webkit-scrollbar { display: none; }
-        
-        .week-tab {
+        .week-tabs::-webkit-scrollbar { display:none; }
+
+        .wtab {
             flex-shrink: 0;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid var(--border2);
             background: transparent;
-            color: #8b9dc3;
-            font-size: 0.85rem;
-            font-weight: 500;
+            color: var(--text2);
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
             transition: all 0.2s;
         }
-        
-        .week-tab.active {
-            background: #e8d5b7;
-            color: #1a1a2e;
-            border-color: #e8d5b7;
+        .wtab.active {
+            background: var(--accent);
+            color: #180e00;
+            border-color: var(--accent);
+            box-shadow: 0 2px 14px rgba(242,196,108,0.35);
         }
-        
+
+        /* ── Scrollable Content ─────────────────────── */
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            overflow-x: hidden;
+            padding: 16px 14px 8px;
+            scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
-        
-        .theme-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            background: rgba(232, 213, 183, 0.15);
-            border-radius: 20px;
-            color: #e8d5b7;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-        
-        .verse-card {
-            background: rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .verse-ref {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #e8d5b7;
-            margin-bottom: 12px;
-        }
-        
-        .verse-text {
-            font-size: 1.05rem;
-            line-height: 1.85;
-            color: #e0e6ef;
-            word-break: keep-all;
-        }
-        
-        .player {
-            background: rgba(0,0,0,0.4);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 16px 20px;
-            padding-bottom: max(16px, env(safe-area-inset-bottom));
-            flex-shrink: 0;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-            margin-bottom: 12px;
-            cursor: pointer;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #e8d5b7;
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-        
-        .time-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: #8b9dc3;
-            margin-bottom: 16px;
-        }
-        
-        .controls {
+        .content::-webkit-scrollbar { display:none; }
+
+        /* Theme Row */
+        .theme-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            gap: 10px;
+            margin-bottom: 14px;
         }
-        
-        .ctrl-btn {
-            width: 50px;
-            height: 50px;
+        .theme-badge {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--accent-border);
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+
+        /* Verse Card */
+        .verse-card {
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            padding: 16px 16px 14px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .verse-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 18px 0 0 18px;
+        }
+        .verse-card.playing {
+            border-color: var(--accent-border);
+            background: rgba(242,196,108,0.055);
+            box-shadow: 0 0 28px var(--accent-glow), inset 0 0 20px rgba(242,196,108,0.03);
+        }
+        .verse-card.playing::before { opacity: 1; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .verse-num {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
+            border-radius: 8px;
+            padding: 2px 8px;
+            letter-spacing: 0.04em;
+        }
+        .verse-ref {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .card-play-btn {
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            font-size: 1.3rem;
+            border: 1px solid var(--border2);
+            background: var(--surface2);
+            color: var(--text2);
+            font-size: 0.75rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.15s;
+            flex-shrink: 0;
         }
-        
-        .ctrl-btn:active {
-            transform: scale(0.95);
-            background: rgba(255,255,255,0.2);
+        .verse-card.playing .card-play-btn {
+            background: var(--accent);
+            color: #180e00;
+            border-color: var(--accent);
         }
-        
-        .ctrl-btn.play {
-            width: 70px;
-            height: 70px;
-            background: #e8d5b7;
-            color: #1a1a2e;
-            font-size: 1.8rem;
+        .card-play-btn:active { transform: scale(0.92); }
+
+        .verse-text {
+            font-size: 1.02rem;
+            line-height: 2.0;
+            color: #c8d4e8;
+            word-break: keep-all;
+            font-weight: 400;
         }
-        
-        .ctrl-btn.play:active { background: #d4c4a8; }
-        
-        .repeat-info {
+        .verse-card.playing .verse-text {
+            color: var(--text1);
+        }
+
+        /* Playing pulse animation */
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+            50%       { box-shadow: 0 0 36px rgba(242,196,108,0.28); }
+        }
+        .verse-card.playing { animation: pulse-border 2.5s ease-in-out infinite; }
+
+        /* ── Player ────────────────────────────────── */
+        .player {
+            flex-shrink: 0;
+            background: rgba(7,9,15,0.96);
+            border-top: 1px solid var(--border);
+            padding: 12px 18px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            backdrop-filter: blur(16px);
+        }
+
+        /* Mode Selector */
+        .mode-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border2);
+            background: transparent;
+            color: var(--text2);
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: center;
+        }
+        .mode-btn.active {
+            background: var(--accent-soft);
+            border-color: var(--accent-border);
+            color: var(--accent);
+        }
+
+        /* Progress */
+        .progress-area { margin-bottom: 10px; }
+        .progress-track {
+            width: 100%;
+            height: 3px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 2px;
+            cursor: pointer;
             position: relative;
         }
-        
-        .repeat-badge {
+        .progress-track:hover { height: 5px; margin: -1px 0; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #c8963c, var(--accent));
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
             position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #e8d5b7;
-            color: #1a1a2e;
-            font-size: 0.7rem;
-            font-weight: 700;
-            width: 20px;
-            height: 20px;
+            right: -5px; top: 50%;
+            transform: translateY(-50%);
+            width: 11px; height: 11px;
             border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent-glow);
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        .progress-track:hover .progress-fill::after { opacity: 1; }
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.72rem;
+            color: var(--text3);
+        }
+
+        /* Controls */
+        .controls {
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
         }
-        
-        .status-text {
-            text-align: center;
-            font-size: 0.85rem;
-            color: #8b9dc3;
-            margin-top: 14px;
-        }
-        
-        .status-text.playing { color: #81c784; }
-        .status-text.error { color: #ef5350; }
-        
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-        
-        .modal-overlay.show { display: flex; }
-        
-        .modal {
-            background: #1a1a2e;
-            border-radius: 20px;
-            padding: 24px;
-            width: 280px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .modal h3 {
-            color: #e8d5b7;
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .repeat-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        
-        .repeat-opt {
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: transparent;
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        
-        .repeat-opt.selected {
-            background: #e8d5b7;
-            color: #1a1a2e;
-            border-color: #e8d5b7;
-        }
-        
-        .modal-close {
-            width: 100%;
-            margin-top: 16px;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+        .cbtn {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border2);
+            background: var(--surface);
+            color: var(--text2);
             font-size: 1rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            font-family: inherit;
+            font-weight: 700;
         }
-        
-        .speed-text { font-size: 0.8rem !important; font-weight: 600; }
+        .cbtn:hover { background: var(--surface2); color: var(--text1); }
+        .cbtn:active { transform: scale(0.93); }
+
+        .cbtn.play-main {
+            width: 64px; height: 64px;
+            background: linear-gradient(145deg, var(--accent), #c8902a);
+            color: #180e00;
+            font-size: 1.5rem;
+            border: none;
+            box-shadow: 0 4px 20px rgba(242,196,108,0.4);
+        }
+        .cbtn.play-main:hover { box-shadow: 0 4px 28px rgba(242,196,108,0.55); }
+        .cbtn.play-main:active { background: linear-gradient(145deg, #d9a840, #b07820); }
+
+        .cbtn.speed { font-size: 0.75rem; letter-spacing:-0.03em; }
+
+        .repeat-wrap { position: relative; }
+        .rbadge {
+            position: absolute;
+            top: -3px; right: -3px;
+            background: var(--accent);
+            color: #180e00;
+            font-size: 0.6rem;
+            font-weight: 800;
+            min-width: 17px; height: 17px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            pointer-events: none;
+        }
+
+        /* Status */
+        .status {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text3);
+            min-height: 1.1em;
+            letter-spacing: 0.01em;
+        }
+        .status.playing { color: var(--green); }
+        .status.error   { color: var(--red); }
+        .status.warn    { color: var(--accent); opacity: 0.8; }
+
+        /* ── Bottom Sheet Modal ─────────────────────── */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 200;
+        }
+        .overlay.show { display: flex; }
+
+        .sheet {
+            width: 100%;
+            max-width: 520px;
+            background: #111828;
+            border-radius: 24px 24px 0 0;
+            padding: 20px 18px;
+            border: 1px solid var(--border2);
+            border-bottom: none;
+        }
+        .sheet-handle {
+            width: 36px; height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+        .sheet h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text1);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .repeat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .ropt {
+            padding: 13px 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border2);
+            background: var(--surface);
+            color: var(--text1);
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .ropt:hover { background: var(--surface2); }
+        .ropt.sel {
+            background: var(--accent-soft);
+            border-color: var(--accent-border);
+            color: var(--accent);
+        }
+        .ropt.inf { font-size: 1.4rem; padding: 9px 6px; }
+
+        .sheet-close {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
+            color: var(--accent);
+            font-size: 0.92rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .sheet-close:hover { background: rgba(242,196,108,0.2); }
+
+        /* ── Waveform animation for playing state ─── */
+        .wave-icon {
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+        .wave-icon span {
+            display: block;
+            width: 3px;
+            background: var(--green);
+            border-radius: 2px;
+            animation: wave 0.8s ease-in-out infinite alternate;
+        }
+        .wave-icon span:nth-child(1) { height: 6px;  animation-delay: 0s; }
+        .wave-icon span:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+        .wave-icon span:nth-child(3) { height: 9px;  animation-delay: 0.3s; }
+        .wave-icon span:nth-child(4) { height: 12px; animation-delay: 0.1s; }
+        @keyframes wave {
+            from { transform: scaleY(0.4); }
+            to   { transform: scaleY(1); }
+        }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <h1>📖 성경 암송</h1>
+<div class="app">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-label">Sarang Community Church</div>
+        <h1>📖 새일꾼반 성경암송</h1>
+    </div>
+
+    <!-- Week Tabs -->
+    <div class="week-tabs" id="weekTabs"></div>
+
+    <!-- Verse Content -->
+    <div class="content" id="content"></div>
+
+    <!-- Player -->
+    <div class="player">
+        <!-- Play Mode Selector -->
+        <div class="mode-row">
+            <button class="mode-btn active" data-mode="v1">1절만</button>
+            <button class="mode-btn"        data-mode="v2">2절만</button>
+            <button class="mode-btn"        data-mode="all">전체 (1절+2절)</button>
         </div>
-        
-        <div class="week-tabs" id="weekTabs"></div>
-        
-        <div class="content" id="content"></div>
-        
-        <div class="player">
-            <div class="progress-bar" id="progressBar">
+
+        <!-- Progress -->
+        <div class="progress-area">
+            <div class="progress-track" id="progressTrack">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="time-info">
-                <span id="currentTime">0:00</span>
-                <span id="totalTime">0:00</span>
+            <div class="time-row">
+                <span id="curTime">0:00</span>
+                <span id="totTime">0:00</span>
             </div>
-            <div class="controls">
-                <button class="ctrl-btn speed-text" id="speedBtn" aria-label="재생 속도">1x</button>
-                <button class="ctrl-btn" id="prevBtn" aria-label="이전 주차">⏮</button>
-                <button class="ctrl-btn play" id="playBtn" aria-label="재생">▶</button>
-                <button class="ctrl-btn" id="nextBtn" aria-label="다음 주차">⏭</button>
-                <div class="repeat-info">
-                    <button class="ctrl-btn" id="repeatBtn" aria-label="반복 설정">🔁</button>
-                    <span class="repeat-badge" id="repeatBadge">3</span>
-                </div>
-            </div>
-            <div class="status-text" id="status">주차를 선택하고 재생하세요</div>
         </div>
-    </div>
-    
-    <div class="modal-overlay" id="repeatModal">
-        <div class="modal">
-            <h3>반복 횟수 선택</h3>
-            <div class="repeat-options">
-                <button class="repeat-opt" data-val="1">1회</button>
-                <button class="repeat-opt" data-val="2">2회</button>
-                <button class="repeat-opt selected" data-val="3">3회</button>
-                <button class="repeat-opt" data-val="5">5회</button>
-                <button class="repeat-opt" data-val="7">7회</button>
-                <button class="repeat-opt" data-val="10">10회</button>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="cbtn speed" id="speedBtn" aria-label="재생속도">1x</button>
+            <button class="cbtn" id="prevBtn" aria-label="이전">⏮</button>
+            <button class="cbtn play-main" id="playBtn" aria-label="재생">▶</button>
+            <button class="cbtn" id="nextBtn" aria-label="다음">⏭</button>
+            <div class="repeat-wrap">
+                <button class="cbtn" id="repeatBtn" aria-label="반복설정">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                    </svg>
+                </button>
+                <span class="rbadge" id="rbadge">∞</span>
             </div>
-            <button class="modal-close" id="modalClose">확인</button>
         </div>
+
+        <div class="status" id="status">주차를 선택하고 재생하세요</div>
     </div>
+</div>
 
-    <script>
-        // 성경 암송 데이터
-        const weeks = [
-            {
-                theme: "중심되신 그리스도",
-                verses: [
-                    { ref: "갈라디아서 2:20", text: "내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 사는 것이 아니요 오직 내 안에 그리스도께서 사시는 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 자신을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라" },
-                    { ref: "요한복음 15:5", text: "나는 포도나무요 너희는 가지라 그가 내 안에, 내가 그 안에 거하면 사람이 열매를 많이 맺나니 나를 떠나서는 너희가 아무 것도 할 수 없음이라" }
-                ]
-            },
-            {
-                theme: "구원의 확신",
-                verses: [
-                    { ref: "요한일서 5:13", text: "내가 하나님의 아들의 이름을 믿는 너희에게 이것을 쓰는 것은 너희로 하여금 너희에게 영생이 있음을 알게 하려 함이라" },
-                    { ref: "요한복음 5:24", text: "내가 진실로 진실로 너희에게 이르노니 내 말을 듣고 또 나를 보내신 이를 믿는 자는 영생을 얻었고 심판에 이르지 아니하나니 사망에서 생명으로 옮겼느니라" }
-                ]
-            },
-            {
-                theme: "하나님의 속성",
-                verses: [
-                    { ref: "역대상 29:11", text: "여호와여 위대하심과 권능과 영광과 승리와 위엄이 다 주께 속하였사오니 천지에 있는 것이 다 주의 것이로소이다 여호와여 주권도 주께 속하였사오니 주는 높으사 만물의 머리이심이니이다" },
-                    { ref: "시편 36:5-6", text: "여호와여 주의 인자하심이 하늘에 있고 주의 진실하심이 공중에 사무쳤으며 주의 의는 하나님의 산들과 같고 주의 심판은 큰 바다와 같으니이다 여호와여 주는 사람과 짐승을 구하여 주시나이다" }
-                ]
-            },
-            {
-                theme: "성경",
-                verses: [
-                    { ref: "디모데후서 3:16-17", text: "모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니 이는 하나님의 사람으로 온전하게 하며 모든 선한 일을 행할 능력을 갖추게 하려 함이라" },
-                    { ref: "베드로전서 2:2", text: "갓난 아기들 같이 순전하고 신령한 젖을 사모하라 이는 그로 말미암아 너희로 구원에 이르도록 자라게 하려 함이라" }
-                ]
-            },
-            {
-                theme: "기도",
-                verses: [
-                    { ref: "요한복음 15:7", text: "너희가 내 안에 거하고 내 말이 너희 안에 거하면 무엇이든지 원하는 대로 구하라 그리하면 이루리라" },
-                    { ref: "빌립보서 4:6-7", text: "아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라" }
-                ]
-            },
-            {
-                theme: "교제",
-                verses: [
-                    { ref: "로마서 12:4-5", text: "우리가 한 몸에 많은 지체를 가졌으나 모든 지체가 같은 기능을 가진 것이 아니니 이와 같이 우리 많은 사람이 그리스도 안에서 한 몸이 되어 서로 지체가 되었느니라" },
-                    { ref: "요한복음 13:34-35", text: "새 계명을 너희에게 주노니 서로 사랑하라 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라 너희가 서로 사랑하면 이로써 모든 사람이 너희가 내 제자인 줄 알리라" }
-                ]
-            },
-            {
-                theme: "전도",
-                verses: [
-                    { ref: "로마서 1:16", text: "내가 복음을 부끄러워하지 아니하노니 이 복음은 모든 믿는 자에게 구원을 주시는 하나님의 능력이 됨이라 먼저는 유대인에게요 그리고 헬라인에게로다" },
-                    { ref: "베드로전서 3:15", text: "너희 마음에 그리스도를 주로 삼아 거룩하게 하고 너희 속에 있는 소망에 관한 이유를 묻는 자에게는 대답할 것을 항상 준비하되 온유와 두려움으로 하고" }
-                ]
-            },
-            {
-                theme: "성령충만한 삶",
-                verses: [
-                    { ref: "에베소서 5:18", text: "술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라" },
-                    { ref: "갈라디아서 5:22-23", text: "오직 성령의 열매는 사랑과 희락과 화평과 오래 참음과 자비와 양선과 충성과 온유와 절제니 이같은 것을 금지할 법이 없느니라" }
-                ]
-            },
-            {
-                theme: "시험을 이기는 삶",
-                verses: [
-                    { ref: "고린도전서 10:13", text: "사람이 감당할 시험 밖에는 너희가 당한 것이 없나니 오직 미쁘사 너희가 감당하지 못할 시험 당함을 허락하지 아니하시고 시험 당할 즈음에 또한 피할 길을 내사 너희로 능히 감당하게 하시느니라" },
-                    { ref: "야고보서 1:14-15", text: "오직 각 사람이 시험을 받는 것은 자기 욕심에 끌려 미혹됨이니 욕심이 잉태한즉 죄를 낳고 죄가 장성한즉 사망을 낳느니라" }
-                ]
-            },
-            {
-                theme: "순종하는 삶",
-                verses: [
-                    { ref: "로마서 12:1", text: "그러므로 형제들아 내가 하나님의 모든 자비하심으로 너희를 권하노니 너희 몸을 하나님이 기뻐하시는 거룩한 산 제물로 드리라 이는 너희가 드릴 영적 예배니라" },
-                    { ref: "누가복음 9:23", text: "또 무리에게 이르시되 아무든지 나를 따라오려거든 자기를 부인하고 날마다 제 십자가를 지고 나를 따를 것이니라" }
-                ]
-            },
-            {
-                theme: "사역하는 삶",
-                verses: [
-                    { ref: "베드로전서 2:9", text: "그러나 너희는 택하신 족속이요 왕 같은 제사장들이요 거룩한 나라요 그의 소유가 된 백성이니 이는 너희를 어두운데서 불러 내어 그의 기이한 빛에 들어가게 하신 이의 아름다운 덕을 선포하게 하려 하심이라" },
-                    { ref: "고린도전서 3:9", text: "우리는 하나님의 동역자들이요 너희는 하나님의 밭이요 하나님의 집이니라" }
-                ]
-            }
-        ];
+<!-- Repeat Sheet -->
+<div class="overlay" id="overlay">
+    <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h3>반복 횟수 설정</h3>
+        <div class="repeat-grid">
+            <button class="ropt"     data-val="1">1회</button>
+            <button class="ropt"     data-val="2">2회</button>
+            <button class="ropt"     data-val="3">3회</button>
+            <button class="ropt"     data-val="5">5회</button>
+            <button class="ropt"     data-val="7">7회</button>
+            <button class="ropt"     data-val="10">10회</button>
+            <button class="ropt"     data-val="20">20회</button>
+            <button class="ropt inf sel" data-val="0">∞</button>
+        </div>
+        <button class="sheet-close" id="sheetClose">확인</button>
+    </div>
+</div>
 
-        // 상태 변수
-        let currentWeek = 0;
-        let isPlaying = false;
-        let audio = null;
-        let repeatCount = 3;
-        let currentRepeat = 0;
-        let speedIndex = 0;
-        let speeds = [1, 1.25, 1.5, 2];
+<script>
+// ═══════════════════════════════════════════════════════
+//  데이터
+// ═══════════════════════════════════════════════════════
+const WEEKS = [
+    {
+        theme: "중심되신 그리스도",
+        verses: [
+            { ref: "갈라디아서 2:20",  text: "내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 사는 것이 아니요 오직 내 안에 그리스도께서 사시는 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 자신을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라" },
+            { ref: "요한복음 15:5",    text: "나는 포도나무요 너희는 가지라 그가 내 안에, 내가 그 안에 거하면 사람이 열매를 많이 맺나니 나를 떠나서는 너희가 아무 것도 할 수 없음이라" }
+        ]
+    },
+    {
+        theme: "구원의 확신",
+        verses: [
+            { ref: "요한일서 5:13",    text: "내가 하나님의 아들의 이름을 믿는 너희에게 이것을 쓰는 것은 너희로 하여금 너희에게 영생이 있음을 알게 하려 함이라" },
+            { ref: "요한복음 5:24",    text: "내가 진실로 진실로 너희에게 이르노니 내 말을 듣고 또 나를 보내신 이를 믿는 자는 영생을 얻었고 심판에 이르지 아니하나니 사망에서 생명으로 옮겼느니라" }
+        ]
+    },
+    {
+        theme: "하나님의 속성",
+        verses: [
+            { ref: "역대상 29:11",     text: "여호와여 위대하심과 권능과 영광과 승리와 위엄이 다 주께 속하였사오니 천지에 있는 것이 다 주의 것이로소이다 여호와여 주권도 주께 속하였사오니 주는 높으사 만물의 머리이심이니이다" },
+            { ref: "시편 36:5-6",      text: "여호와여 주의 인자하심이 하늘에 있고 주의 진실하심이 공중에 사무쳤으며 주의 의는 하나님의 산들과 같고 주의 심판은 큰 바다와 같으니이다 여호와여 주는 사람과 짐승을 구하여 주시나이다" }
+        ]
+    },
+    {
+        theme: "성경",
+        verses: [
+            { ref: "디모데후서 3:16-17", text: "모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니 이는 하나님의 사람으로 온전하게 하며 모든 선한 일을 행할 능력을 갖추게 하려 함이라" },
+            { ref: "베드로전서 2:2",   text: "갓난 아기들 같이 순전하고 신령한 젖을 사모하라 이는 그로 말미암아 너희로 구원에 이르도록 자라게 하려 함이라" }
+        ]
+    },
+    {
+        theme: "기도",
+        verses: [
+            { ref: "요한복음 15:7",    text: "너희가 내 안에 거하고 내 말이 너희 안에 거하면 무엇이든지 원하는 대로 구하라 그리하면 이루리라" },
+            { ref: "빌립보서 4:6-7",   text: "아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라" }
+        ]
+    },
+    {
+        theme: "교제",
+        verses: [
+            { ref: "로마서 12:4-5",    text: "우리가 한 몸에 많은 지체를 가졌으나 모든 지체가 같은 기능을 가진 것이 아니니 이와 같이 우리 많은 사람이 그리스도 안에서 한 몸이 되어 서로 지체가 되었느니라" },
+            { ref: "요한복음 13:34-35", text: "새 계명을 너희에게 주노니 서로 사랑하라 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라 너희가 서로 사랑하면 이로써 모든 사람이 너희가 내 제자인 줄 알리라" }
+        ]
+    },
+    {
+        theme: "전도",
+        verses: [
+            { ref: "로마서 1:16",      text: "내가 복음을 부끄러워하지 아니하노니 이 복음은 모든 믿는 자에게 구원을 주시는 하나님의 능력이 됨이라 먼저는 유대인에게요 그리고 헬라인에게로다" },
+            { ref: "베드로전서 3:15",  text: "너희 마음에 그리스도를 주로 삼아 거룩하게 하고 너희 속에 있는 소망에 관한 이유를 묻는 자에게는 대답할 것을 항상 준비하되 온유와 두려움으로 하고" }
+        ]
+    },
+    {
+        theme: "성령충만한 삶",
+        verses: [
+            { ref: "에베소서 5:18",    text: "술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라" },
+            { ref: "갈라디아서 5:22-23", text: "오직 성령의 열매는 사랑과 희락과 화평과 오래 참음과 자비와 양선과 충성과 온유와 절제니 이같은 것을 금지할 법이 없느니라" }
+        ]
+    },
+    {
+        theme: "시험을 이기는 삶",
+        verses: [
+            { ref: "고린도전서 10:13", text: "사람이 감당할 시험 밖에는 너희가 당한 것이 없나니 오직 미쁘사 너희가 감당하지 못할 시험 당함을 허락하지 아니하시고 시험 당할 즈음에 또한 피할 길을 내사 너희로 능히 감당하게 하시느니라" },
+            { ref: "야고보서 1:14-15", text: "오직 각 사람이 시험을 받는 것은 자기 욕심에 끌려 미혹됨이니 욕심이 잉태한즉 죄를 낳고 죄가 장성한즉 사망을 낳느니라" }
+        ]
+    },
+    {
+        theme: "순종하는 삶",
+        verses: [
+            { ref: "로마서 12:1",      text: "그러므로 형제들아 내가 하나님의 모든 자비하심으로 너희를 권하노니 너희 몸을 하나님이 기뻐하시는 거룩한 산 제물로 드리라 이는 너희가 드릴 영적 예배니라" },
+            { ref: "누가복음 9:23",    text: "또 무리에게 이르시되 아무든지 나를 따라오려거든 자기를 부인하고 날마다 제 십자가를 지고 나를 따를 것이니라" }
+        ]
+    },
+    {
+        theme: "사역하는 삶",
+        verses: [
+            { ref: "베드로전서 2:9",   text: "그러나 너희는 택하신 족속이요 왕 같은 제사장들이요 거룩한 나라요 그의 소유가 된 백성이니 이는 너희를 어두운데서 불러 내어 그의 기이한 빛에 들어가게 하신 이의 아름다운 덕을 선포하게 하려 하심이라" },
+            { ref: "고린도전서 3:9",   text: "우리는 하나님의 동역자들이요 너희는 하나님의 밭이요 하나님의 집이니라" }
+        ]
+    }
+];
 
-        // DOM 요소
-        const weekTabs = document.getElementById('weekTabs');
-        const contentEl = document.getElementById('content');
-        const playBtn = document.getElementById('playBtn');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const speedBtn = document.getElementById('speedBtn');
-        const repeatBtn = document.getElementById('repeatBtn');
-        const repeatBadge = document.getElementById('repeatBadge');
-        const statusEl = document.getElementById('status');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const currentTimeEl = document.getElementById('currentTime');
-        const totalTimeEl = document.getElementById('totalTime');
-        const repeatModal = document.getElementById('repeatModal');
-        const modalClose = document.getElementById('modalClose');
+// ═══════════════════════════════════════════════════════
+//  오디오 경로 헬퍼
+//  Audio/01_1.mp3 = 1주 제목
+//  Audio/01_2.mp3 = 1주 1절
+//  Audio/01_3.mp3 = 1주 2절
+// ═══════════════════════════════════════════════════════
+function src(weekIdx, track) {  // track: 1=제목, 2=1절, 3=2절
+    return `Audio/${String(weekIdx+1).padStart(2,'0')}_${track}.mp3`;
+}
 
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return '0:00';
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        }
+// ═══════════════════════════════════════════════════════
+//  상태
+// ═══════════════════════════════════════════════════════
+let week        = 0;          // 현재 주차 인덱스
+let mode        = 'v1';       // 'v1' | 'v2' | 'all'
+let repeatTotal = 0;          // 반복 횟수 (0 = 무한)
+let repeatNow   = 0;          // 현재 반복 회차
+let speedIdx    = 0;
+const SPEEDS    = [1, 1.25, 1.5, 2];
 
-        function renderWeekTabs() {
-            weekTabs.innerHTML = '';
-            weeks.forEach((week, idx) => {
-                const tab = document.createElement('button');
-                tab.className = `week-tab ${idx === 0 ? 'active' : ''}`;
-                tab.dataset.week = idx;
-                tab.textContent = `${idx + 1}주차`;
-                weekTabs.appendChild(tab);
-            });
-        }
+let audio       = null;       // 현재 Audio 객체
+let isPlaying   = false;
+let queue       = [];         // 재생할 트랙 번호 배열 (2|3)
+let qIdx        = 0;          // 큐 내 현재 인덱스
 
-        function renderContent() {
-            const week = weeks[currentWeek];
-            contentEl.innerHTML = `
-                <div class="theme-badge">${week.theme}</div>
-                ${week.verses.map(verse => `
-                    <div class="verse-card">
-                        <div class="verse-ref">${verse.ref}</div>
-                        <div class="verse-text">${verse.text}</div>
+// ═══════════════════════════════════════════════════════
+//  DOM
+// ═══════════════════════════════════════════════════════
+const $weekTabs  = document.getElementById('weekTabs');
+const $content   = document.getElementById('content');
+const $playBtn   = document.getElementById('playBtn');
+const $prevBtn   = document.getElementById('prevBtn');
+const $nextBtn   = document.getElementById('nextBtn');
+const $speedBtn  = document.getElementById('speedBtn');
+const $repeatBtn = document.getElementById('repeatBtn');
+const $rbadge    = document.getElementById('rbadge');
+const $status    = document.getElementById('status');
+const $progTrack = document.getElementById('progressTrack');
+const $progFill  = document.getElementById('progressFill');
+const $curTime   = document.getElementById('curTime');
+const $totTime   = document.getElementById('totTime');
+const $overlay   = document.getElementById('overlay');
+const $sheetClose = document.getElementById('sheetClose');
+
+// ═══════════════════════════════════════════════════════
+//  유틸
+// ═══════════════════════════════════════════════════════
+function fmt(s) {
+    if (!isFinite(s) || s < 0) return '0:00';
+    const m = Math.floor(s/60), sec = Math.floor(s%60);
+    return `${m}:${sec<10?'0':''}${sec}`;
+}
+function wLabel() {
+    return mode === 'v1' ? '1절' : mode === 'v2' ? '2절' : '1절+2절';
+}
+function buildQueue() {
+    if (mode === 'v1')  return [1, 2];
+    if (mode === 'v2')  return [1, 3];
+    return [1, 2, 3];
+}
+
+// ═══════════════════════════════════════════════════════
+//  렌더링
+// ═══════════════════════════════════════════════════════
+function renderTabs() {
+    $weekTabs.innerHTML = '';
+    WEEKS.forEach((w, i) => {
+        const btn = document.createElement('button');
+        btn.className = `wtab${i===week?' active':''}`;
+        btn.dataset.w = i;
+        btn.textContent = `${i+1}주차`;
+        $weekTabs.appendChild(btn);
+    });
+}
+
+function renderContent() {
+    const w = WEEKS[week];
+    $content.innerHTML = `
+        <div class="theme-row">
+            <div class="theme-badge">✦ ${w.theme}</div>
+        </div>
+        ${w.verses.map((v,i) => `
+            <div class="verse-card" id="card-${i}">
+                <div class="card-header">
+                    <div class="card-meta">
+                        <span class="verse-ref">${v.ref}</span>
                     </div>
-                `).join('')}
-            `;
+                    <button class="card-play-btn" id="cpbtn-${i}" aria-label="${i+1}절 재생">▶</button>
+                </div>
+                <div class="verse-text">${v.text}</div>
+            </div>
+        `).join('')}
+    `;
+
+    // 카드 재생 버튼
+    w.verses.forEach((_,i) => {
+        document.getElementById(`cpbtn-${i}`).onclick = () => {
+            setMode(i===0 ? 'v1' : 'v2');
+            startPlay();
+        };
+    });
+}
+
+function renderTabActive() {
+    document.querySelectorAll('.wtab').forEach((b,i) => {
+        b.classList.toggle('active', i===week);
+    });
+}
+
+function setCardPlaying(verseIdx) {
+    // verseIdx: 0-based (null = none)
+    for (let i=0; i<2; i++) {
+        const card = document.getElementById(`card-${i}`);
+        const btn  = document.getElementById(`cpbtn-${i}`);
+        if (!card) continue;
+        const active = (i === verseIdx) && isPlaying;
+        card.classList.toggle('playing', active);
+        if (btn) btn.textContent = active ? '⏸' : '▶';
+    }
+}
+
+function clearCards() { setCardPlaying(null); }
+
+// ═══════════════════════════════════════════════════════
+//  모드
+// ═══════════════════════════════════════════════════════
+function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.mode-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === m);
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+//  오디오 엔진
+// ═══════════════════════════════════════════════════════
+function stopAudio() {
+    if (audio) {
+        audio.onended = null;
+        audio.ontimeupdate = null;
+        audio.onloadedmetadata = null;
+        audio.onerror = null;
+        audio.pause();
+        audio.src = '';
+    }
+    audio = null;
+    isPlaying = false;
+    $playBtn.textContent = '▶';
+    $progFill.style.width = '0%';
+    $curTime.textContent  = '0:00';
+    $totTime.textContent  = '0:00';
+    clearCards();
+}
+
+function loadPlay(fileSrc, onEnd, onErr) {
+    if (audio) { audio.onended=null; audio.onerror=null; audio.pause(); audio.src=''; }
+    audio = new Audio();
+    audio.playbackRate = SPEEDS[speedIdx];
+
+    audio.onloadedmetadata = () => { $totTime.textContent = fmt(audio.duration); };
+    audio.ontimeupdate = () => {
+        const pct = (audio.currentTime / audio.duration) * 100 || 0;
+        $progFill.style.width = pct + '%';
+        $curTime.textContent  = fmt(audio.currentTime);
+    };
+    audio.onended = onEnd;
+    audio.onerror = onErr;
+    audio.src = fileSrc;
+    return audio.play().catch(onErr);
+}
+
+// 제목 재생 (독립적, 반복 없음)
+// 메인 재생: 큐 기반 반복
+function startPlay() {
+    stopAudio();
+    queue      = buildQueue();
+    qIdx       = 0;
+    repeatNow  = 1;
+    isPlaying  = true;
+    $playBtn.textContent = '⏸';
+    playNext();
+}
+
+function playNext() {
+    if (qIdx >= queue.length) {
+        // 한 사이클 완료 → 반복 처리
+        if (repeatTotal !== 0 && repeatNow >= repeatTotal) {
+            // 완료
+            isPlaying = false;
+            $playBtn.textContent = '▶';
+            setStatus('', `✓ 반복 완료 (${repeatTotal}회)`);
+            clearCards();
+            return;
         }
+        repeatNow++;
+        qIdx = 0;
+        playNext();
+        return;
+    }
 
-        function updateTabActive() {
-            document.querySelectorAll('.week-tab').forEach((tab, idx) => {
-                tab.classList.toggle('active', idx === currentWeek);
-            });
-        }
+    const track = queue[qIdx];      // 1=제목, 2=1절, 3=2절
 
-        function selectWeek(weekNum) {
-            currentWeek = weekNum;
-            updateTabActive();
-            renderContent();
-            currentRepeat = 0;
-            
-            // 음성 파일 로드
-            const audioSrc = `${String(currentWeek + 1).padStart(2, '0')}.mp3`;
-            loadAudio(audioSrc);
-            statusEl.textContent = `${currentWeek + 1}주차 준비 완료`;
-            statusEl.className = 'status-text';
-        }
+    if (track === 1) {
+        // 제목: 카드 하이라이트 없이 재생
+        clearCards();
+        setStatus('playing', `${week+1}주차 제목 재생 중`);
+    } else {
+        const vi = track - 2;       // 카드 인덱스 (0 또는 1)
+        setCardPlaying(vi);
+        updateStatus();
+        const card = document.getElementById(`card-${vi}`);
+        if (card) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }
 
-        function loadAudio(src) {
-            if (audio) {
-                audio.pause();
-                audio.src = '';
-            }
-            
-            audio = new Audio();
-            audio.src = src;
-            
-            audio.addEventListener('loadedmetadata', () => {
-                totalTimeEl.textContent = formatTime(audio.duration);
-            });
+    loadPlay(
+        src(week, track),
+        () => { qIdx++; playNext(); },
+        () => setStatus('error', `음성 파일 없음: ${src(week, track)}`)
+    );
+}
 
-            audio.addEventListener('timeupdate', () => {
-                const progress = (audio.currentTime / audio.duration) * 100;
-                progressFill.style.width = progress + '%';
-                currentTimeEl.textContent = formatTime(audio.currentTime);
-            });
+function togglePlay() {
+    if (isPlaying) {
+        if (audio) audio.pause();
+        isPlaying = false;
+        $playBtn.textContent = '▶';
+        setStatus('', '일시정지됨');
+    } else if (audio && audio.src && !audio.ended) {
+        audio.play().then(() => {
+            isPlaying = true;
+            $playBtn.textContent = '⏸';
+            updateStatus();
+        }).catch(() => startPlay());
+    } else {
+        startPlay();
+    }
+}
 
-            audio.addEventListener('ended', () => {
-                if (currentRepeat < repeatCount) {
-                    currentRepeat++;
-                    audio.currentTime = 0;
-                    audio.play().catch(e => {
-                        statusEl.textContent = '❌ 재생 실패: ' + e.message;
-                        statusEl.className = 'status-text error';
-                    });
-                    updateStatus();
-                } else {
-                    isPlaying = false;
-                    playBtn.textContent = '▶';
-                    statusEl.textContent = '✅ 반복 완료';
-                    statusEl.className = 'status-text';
-                }
-            });
+// ═══════════════════════════════════════════════════════
+//  상태 텍스트
+// ═══════════════════════════════════════════════════════
+function updateStatus() {
+    const rep = repeatTotal === 0 ? `∞ 무한반복` : `${repeatNow}/${repeatTotal}회`;
+    setStatus('playing', `${week+1}주차 ${wLabel()} 재생 중 — ${rep}`);
+}
+function setStatus(cls, msg) {
+    $status.className = `status${cls ? ' '+cls : ''}`;
+    $status.innerHTML = cls === 'playing'
+        ? `<span class="wave-icon"><span></span><span></span><span></span><span></span></span>${msg}`
+        : msg;
+}
 
-            audio.addEventListener('error', () => {
-                statusEl.textContent = '❌ 음성 파일을 불러올 수 없습니다';
-                statusEl.className = 'status-text error';
-            });
-        }
+// ═══════════════════════════════════════════════════════
+//  주차 선택
+// ═══════════════════════════════════════════════════════
+function selectWeek(w) {
+    stopAudio();
+    week = w;
+    renderTabActive();
+    renderContent();
+    // 탭 스크롤
+    const tab = $weekTabs.children[w];
+    if (tab) tab.scrollIntoView({ inline:'center', behavior:'smooth' });
+    setStatus('', `${week+1}주차 · ${WEEKS[week].theme}`);
+}
 
-        function updateStatus() {
-            statusEl.textContent = `🎵 ${currentWeek + 1}주차 재생 중 (${currentRepeat}/${repeatCount}회)`;
-            statusEl.className = 'status-text playing';
-        }
+// ═══════════════════════════════════════════════════════
+//  이벤트
+// ═══════════════════════════════════════════════════════
+function setupEvents() {
+    // 주차 탭
+    $weekTabs.addEventListener('click', e => {
+        if (e.target.classList.contains('wtab'))
+            selectWeek(parseInt(e.target.dataset.w));
+    });
 
-        function togglePlay() {
-            if (!audio) return;
-            
-            if (isPlaying) {
-                audio.pause();
-                isPlaying = false;
-                playBtn.textContent = '▶';
-                statusEl.textContent = '⏸ 일시정지됨';
-                statusEl.className = 'status-text';
-            } else {
-                if (currentRepeat === 0) currentRepeat = 1;
-                audio.play().then(() => {
-                    isPlaying = true;
-                    playBtn.textContent = '⏸';
-                    updateStatus();
-                }).catch(e => {
-                    statusEl.textContent = '❌ 재생 실패: ' + e.message;
-                    statusEl.className = 'status-text error';
-                });
-            }
-        }
+    // 재생 / 일시정지
+    $playBtn.addEventListener('click', togglePlay);
 
-        function setupEvents() {
-            weekTabs.addEventListener('click', (e) => {
-                if (e.target.classList.contains('week-tab')) {
-                    if (isPlaying && audio) {
-                        audio.pause();
-                        isPlaying = false;
-                        playBtn.textContent = '▶';
-                    }
-                    selectWeek(parseInt(e.target.dataset.week));
-                }
-            });
+    // 이전 / 다음
+    $prevBtn.addEventListener('click', () => {
+        if (week > 0) selectWeek(week - 1);
+    });
+    $nextBtn.addEventListener('click', () => {
+        if (week < WEEKS.length - 1) selectWeek(week + 1);
+    });
 
-            playBtn.addEventListener('click', togglePlay);
+    // 재생 속도
+    $speedBtn.addEventListener('click', () => {
+        speedIdx = (speedIdx + 1) % SPEEDS.length;
+        if (audio) audio.playbackRate = SPEEDS[speedIdx];
+        $speedBtn.textContent = SPEEDS[speedIdx] === 1 ? '1x' : SPEEDS[speedIdx] + 'x';
+    });
 
-            prevBtn.addEventListener('click', () => {
-                if (currentWeek > 0) {
-                    if (audio) audio.pause();
-                    isPlaying = false;
-                    playBtn.textContent = '▶';
-                    selectWeek(currentWeek - 1);
-                }
-            });
+    // 반복 모달
+    $repeatBtn.addEventListener('click', () => $overlay.classList.add('show'));
+    $overlay.addEventListener('click', e => { if (e.target === $overlay) $overlay.classList.remove('show'); });
+    $sheetClose.addEventListener('click', () => $overlay.classList.remove('show'));
 
-            nextBtn.addEventListener('click', () => {
-                if (currentWeek < weeks.length - 1) {
-                    if (audio) audio.pause();
-                    isPlaying = false;
-                    playBtn.textContent = '▶';
-                    selectWeek(currentWeek + 1);
-                }
-            });
+    document.querySelectorAll('.ropt').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.ropt').forEach(b => b.classList.remove('sel'));
+            btn.classList.add('sel');
+            repeatTotal = parseInt(btn.dataset.val);
+            $rbadge.textContent = repeatTotal === 0 ? '∞' : repeatTotal;
+        });
+    });
 
-            speedBtn.addEventListener('click', () => {
-                speedIndex = (speedIndex + 1) % speeds.length;
-                if (audio) audio.playbackRate = speeds[speedIndex];
-                speedBtn.textContent = speeds[speedIndex] === 1 ? '1x' : speeds[speedIndex] + 'x';
-            });
+    // 모드 선택
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setMode(btn.dataset.mode);
+            if (isPlaying) startPlay();   // 재생 중이면 즉시 새 모드로 재시작
+        });
+    });
 
-            repeatBtn.addEventListener('click', () => {
-                repeatModal.classList.add('show');
-            });
+    // 프로그레스 클릭
+    $progTrack.addEventListener('click', e => {
+        if (!audio || !audio.duration) return;
+        const r = $progTrack.getBoundingClientRect();
+        audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+    });
+}
 
-            repeatModal.addEventListener('click', (e) => {
-                if (e.target === repeatModal) repeatModal.classList.remove('show');
-            });
-
-            modalClose.addEventListener('click', () => {
-                repeatModal.classList.remove('show');
-            });
-
-            document.querySelectorAll('.repeat-opt').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.repeat-opt').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    repeatCount = parseInt(btn.dataset.val);
-                    repeatBadge.textContent = repeatCount;
-                    currentRepeat = 0;
-                });
-            });
-
-            progressBar.addEventListener('click', (e) => {
-                if (!audio) return;
-                const rect = progressBar.getBoundingClientRect();
-                const pct = (e.clientX - rect.left) / rect.width;
-                audio.currentTime = pct * audio.duration;
-            });
-        }
-
-        function init() {
-            renderWeekTabs();
-            selectWeek(0);
-            setupEvents();
-        }
-
-        // 페이지 로드 시 초기화
-        init();
-    </script>
+// ═══════════════════════════════════════════════════════
+//  초기화
+// ═══════════════════════════════════════════════════════
+function init() {
+    renderTabs();
+    selectWeek(0);
+    setupEvents();
+}
+init();
+</script>
 </body>
 </html>
