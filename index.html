@@ -526,7 +526,9 @@
                     <polygon points="19,5 9,12 19,19"/>
                 </svg>
             </button>
-            <button class="cbtn play-main" id="playBtn" aria-label="재생">▶</button>
+            <button class="cbtn play-main" id="playBtn" aria-label="재생">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+            </button>
             <button class="cbtn" id="nextBtn" aria-label="다음">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <rect x="16.5" y="5" width="2.5" height="14" rx="1.2"/>
@@ -567,6 +569,12 @@
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════
+//  SVG 아이콘
+// ═══════════════════════════════════════════════════════
+const ICON_PLAY  = `<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>`;
+const ICON_PAUSE = `<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1.5"/><rect x="15" y="3" width="4" height="18" rx="1.5"/></svg>`;
+
 // ═══════════════════════════════════════════════════════
 //  데이터
 // ═══════════════════════════════════════════════════════
@@ -797,7 +805,7 @@ function stopAudio() {
     }
     audio = null;
     isPlaying = false;
-    $playBtn.textContent = '▶';
+    $playBtn.innerHTML = ICON_PLAY;
     $progFill.style.width = '0%';
     $curTime.textContent  = '0:00';
     $totTime.textContent  = '0:00';
@@ -829,7 +837,7 @@ function startPlay() {
     qIdx       = 0;
     repeatNow  = 1;
     isPlaying  = true;
-    $playBtn.textContent = '⏸';
+    $playBtn.innerHTML = ICON_PAUSE;
     playNext();
 }
 
@@ -839,7 +847,7 @@ function playNext() {
         if (repeatTotal !== 0 && repeatNow >= repeatTotal) {
             // 완료
             isPlaying = false;
-            $playBtn.textContent = '▶';
+            $playBtn.innerHTML = ICON_PLAY;
             setStatus('', `✓ 반복 완료 (${repeatTotal}회)`);
             clearCards();
             return;
@@ -875,12 +883,12 @@ function togglePlay() {
     if (isPlaying) {
         if (audio) audio.pause();
         isPlaying = false;
-        $playBtn.textContent = '▶';
+        $playBtn.innerHTML = ICON_PLAY;
         setStatus('', '일시정지됨');
     } else if (audio && audio.src && !audio.ended) {
         audio.play().then(() => {
             isPlaying = true;
-            $playBtn.textContent = '⏸';
+            $playBtn.innerHTML = ICON_PAUSE;
             updateStatus();
         }).catch(() => startPlay());
     } else {
