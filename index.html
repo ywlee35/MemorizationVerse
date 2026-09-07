@@ -21,6 +21,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap');
 
         :root {
+            color-scheme: dark;          /* 다크 전용 앱 */
             --bg:            #07090f;
             --bg2:           #0c1020;
             --bg3:           #111830;
@@ -70,25 +71,38 @@
             text-align: center;
             backdrop-filter: blur(10px);
         }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+        }
         .header-logo {
-            display: block;
-            height: 30px;
+            height: 28px;
             width: auto;
-            margin: 0 auto 8px;
+            flex-shrink: 0;
+        }
+        .brand-divider {
+            width: 1px;
+            height: 19px;
+            background: var(--border2);
+            flex-shrink: 0;
         }
         .header h1 {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 800;
             color: var(--text1);
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
+            white-space: nowrap;
+        }
+        /* 좁은 화면에서 한 줄이 넘치지 않도록 */
+        @media (max-width: 359px) {
+            .header-logo { height: 24px; }
+            .header h1   { font-size: 0.94rem; }
+            .header-brand { gap: 8px; }
         }
 
-        /* ── Language / Voice Selector ──────────────── */
-        .voice-row {
-            display: flex;
-            gap: 6px;
-            margin-top: 11px;
-        }
+        /* ── Segmented Control (설정 시트에서 사용) ──── */
         .seg {
             flex: 1;
             display: flex;
@@ -284,32 +298,6 @@
             backdrop-filter: blur(16px);
         }
 
-        /* Mode Selector */
-        .mode-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
-        .mode-btn {
-            flex: 1;
-            padding: 8px 0;
-            border-radius: 12px;
-            border: 1px solid var(--border2);
-            background: transparent;
-            color: var(--text2);
-            font-size: 0.82rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.18s;
-            text-align: center;
-        }
-        .mode-btn.active {
-            background: var(--accent-soft);
-            border-color: var(--accent-border);
-            color: var(--accent);
-        }
-
         /* Progress */
         .progress-area { margin-bottom: 10px; }
         .progress-track {
@@ -418,6 +406,30 @@
         .status.error   { color: var(--red); }
         .status.warn    { color: var(--accent); opacity: 0.8; }
 
+        /* ── 설정 진입 바 ──────────────────────────── */
+        .settings-bar {
+            width: 100%;
+            margin-top: 11px;
+            padding: 9px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border2);
+            background: transparent;
+            color: var(--text2);
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .settings-bar:hover { background: var(--surface); color: var(--text1); }
+        .settings-bar:active { transform: scale(0.985); }
+        .settings-bar svg { flex-shrink: 0; opacity: 0.75; }
+
         /* ── Bottom Sheet Modal ─────────────────────── */
         .overlay {
             position: fixed;
@@ -437,8 +449,20 @@
             background: #111828;
             border-radius: 24px 24px 0 0;
             padding: 20px 18px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
             border: 1px solid var(--border2);
             border-bottom: none;
+            max-height: 88vh;
+            overflow-y: auto;
+        }
+        .set-group { margin-bottom: 15px; }
+        .set-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text2);
+            letter-spacing: 0.02em;
+            margin-bottom: 7px;
+            padding-left: 2px;
         }
         .sheet-handle {
             width: 36px; height: 4px;
@@ -527,20 +551,11 @@
 
     <!-- Header -->
     <div class="header">
-        <img class="header-logo" src="logo_Sarang.png" alt="남가주사랑의교회"
-             width="496" height="115">
-        <h1>새일꾼반 성경암송</h1>
-
-        <!-- Language / Voice Selector -->
-        <div class="voice-row">
-            <div class="seg" id="langSeg">
-                <button class="seg-btn active" data-lang="ko">한국어</button>
-                <button class="seg-btn"        data-lang="en">English</button>
-            </div>
-            <div class="seg" id="genderSeg">
-                <button class="seg-btn active" data-gender="F">여성</button>
-                <button class="seg-btn"        data-gender="M">남성</button>
-            </div>
+        <div class="header-brand">
+            <img class="header-logo" src="logo_Sarang.png" alt="남가주사랑의교회"
+                 width="496" height="115">
+            <span class="brand-divider"></span>
+            <h1>새일꾼반 성경암송</h1>
         </div>
     </div>
 
@@ -552,13 +567,6 @@
 
     <!-- Player -->
     <div class="player">
-        <!-- Play Mode Selector -->
-        <div class="mode-row">
-            <button class="mode-btn active" data-mode="v1">1절만</button>
-            <button class="mode-btn"        data-mode="v2">2절만</button>
-            <button class="mode-btn"        data-mode="all">전체 (1절+2절)</button>
-        </div>
-
         <!-- Progress -->
         <div class="progress-area">
             <div class="progress-track" id="progressTrack">
@@ -599,14 +607,51 @@
         </div>
 
         <div class="status" id="status">주차를 선택하고 재생하세요</div>
+
+        <!-- Settings -->
+        <button class="settings-bar" id="settingsBtn" aria-label="설정 열기">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span id="settingsSummary">한국어 · 여성 · 전체</span>
+        </button>
     </div>
 </div>
 
-<!-- Repeat Sheet -->
+<!-- Settings Sheet -->
 <div class="overlay" id="overlay">
     <div class="sheet">
         <div class="sheet-handle"></div>
-        <h3>반복 횟수 설정</h3>
+        <h3>설정</h3>
+
+        <div class="set-group">
+            <div class="set-label">언어</div>
+            <div class="seg" id="langSeg">
+                <button class="seg-btn active" data-lang="ko">한국어</button>
+                <button class="seg-btn"        data-lang="en">English</button>
+            </div>
+        </div>
+
+        <div class="set-group">
+            <div class="set-label">음성</div>
+            <div class="seg" id="genderSeg">
+                <button class="seg-btn active" data-gender="F">여성</button>
+                <button class="seg-btn"        data-gender="M">남성</button>
+            </div>
+        </div>
+
+        <div class="set-group">
+            <div class="set-label">재생 구간</div>
+            <div class="seg" id="modeSeg">
+                <button class="seg-btn"        data-mode="v1">1절만</button>
+                <button class="seg-btn"        data-mode="v2">2절만</button>
+                <button class="seg-btn active" data-mode="all">전체</button>
+            </div>
+        </div>
+
+        <div class="set-label">반복 횟수</div>
         <div class="repeat-grid">
             <button class="ropt"     data-val="1">1회</button>
             <button class="ropt"     data-val="2">2회</button>
@@ -850,7 +895,7 @@ function src(weekIdx, track) {  // track: 1=제목, 2=1절, 3=2절
 let week        = 0;          // 현재 주차 인덱스
 let lang        = 'ko';       // 'ko' | 'en'  — 음성 + 화면 텍스트
 let gender      = 'F';        // 'F' | 'M'    — 음성 성별
-let mode        = 'v1';       // 'v1' | 'v2' | 'all'
+let mode        = 'all';      // 'v1' | 'v2' | 'all'  (기본: 전체)
 let repeatTotal = 0;          // 반복 횟수 (0 = 무한)
 let repeatNow   = 0;          // 현재 반복 회차
 let speedIdx    = 0;
@@ -879,6 +924,9 @@ const $curTime   = document.getElementById('curTime');
 const $totTime   = document.getElementById('totTime');
 const $langSeg   = document.getElementById('langSeg');
 const $genderSeg = document.getElementById('genderSeg');
+const $modeSeg   = document.getElementById('modeSeg');
+const $settingsBtn     = document.getElementById('settingsBtn');
+const $settingsSummary = document.getElementById('settingsSummary');
 const $overlay   = document.getElementById('overlay');
 const $sheetClose = document.getElementById('sheetClose');
 
@@ -969,15 +1017,31 @@ function clearCards() { setCardPlaying(null); }
 const PREF_KEY = 'srcc-memoryverses-pref';
 
 function savePref() {
-    try { localStorage.setItem(PREF_KEY, JSON.stringify({ lang, gender })); } catch {}
+    try {
+        localStorage.setItem(PREF_KEY, JSON.stringify({ lang, gender, mode, repeat: repeatTotal }));
+    } catch {}
 }
 function loadPref() {
     try {
         const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
-        if (p.lang === 'ko' || p.lang === 'en')   lang   = p.lang;
-        if (p.gender === 'F' || p.gender === 'M') gender = p.gender;
+        if (p.lang === 'ko' || p.lang === 'en')            lang   = p.lang;
+        if (p.gender === 'F' || p.gender === 'M')          gender = p.gender;
+        if (['v1','v2','all'].includes(p.mode))            mode   = p.mode;
+        if (Number.isInteger(p.repeat) && p.repeat >= 0)   repeatTotal = p.repeat;
     } catch {}
 }
+
+// 설정 바에 현재 선택을 요약해 보여준다
+function updateSummary() {
+    if (!$settingsSummary) return;
+    const L = lang === 'ko' ? '한국어' : 'English';
+    const G = gender === 'F' ? '여성' : '남성';
+    const M = mode === 'v1' ? '1절만' : mode === 'v2' ? '2절만' : '전체';
+    $settingsSummary.textContent = `${L} · ${G} · ${M}`;
+}
+
+function openSettings()  { $overlay.classList.add('show'); }
+function closeSettings() { $overlay.classList.remove('show'); }
 
 // 선택 변경 시: 화면 텍스트를 다시 그리고, 재생 중이면 새 음성으로 재시작
 function applyVoiceChange() {
@@ -987,6 +1051,7 @@ function applyVoiceChange() {
     if (wasPlaying) startPlay();
     else setStatus('', `${week+1}주차 · ${WEEKS[week].theme[lang]}`);
     savePref();
+    updateSummary();
     prefetchWeek(week);
 }
 
@@ -1010,9 +1075,21 @@ function setGender(g) {
 // ═══════════════════════════════════════════════════════
 function setMode(m) {
     mode = m;
-    document.querySelectorAll('.mode-btn').forEach(b => {
+    $modeSeg.querySelectorAll('.seg-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.mode === m);
     });
+    updateSummary();
+    savePref();
+}
+
+// 반복 횟수 (0 = 무한)
+function setRepeat(v) {
+    repeatTotal = v;
+    document.querySelectorAll('.ropt').forEach(b => {
+        b.classList.toggle('sel', parseInt(b.dataset.val) === v);
+    });
+    $rbadge.textContent = v === 0 ? '∞' : v;
+    savePref();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1249,26 +1326,23 @@ function setupEvents() {
         $speedBtn.textContent = SPEEDS[speedIdx] === 1 ? '1x' : SPEEDS[speedIdx] + 'x';
     });
 
-    // 반복 모달
-    $repeatBtn.addEventListener('click', () => $overlay.classList.add('show'));
-    $overlay.addEventListener('click', e => { if (e.target === $overlay) $overlay.classList.remove('show'); });
-    $sheetClose.addEventListener('click', () => $overlay.classList.remove('show'));
+    // 설정 시트 열기 (하단 설정 바 · 반복 버튼 모두 같은 시트)
+    $settingsBtn.addEventListener('click', openSettings);
+    $repeatBtn.addEventListener('click', openSettings);
+    $overlay.addEventListener('click', e => { if (e.target === $overlay) closeSettings(); });
+    $sheetClose.addEventListener('click', closeSettings);
 
+    // 반복 횟수
     document.querySelectorAll('.ropt').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.ropt').forEach(b => b.classList.remove('sel'));
-            btn.classList.add('sel');
-            repeatTotal = parseInt(btn.dataset.val);
-            $rbadge.textContent = repeatTotal === 0 ? '∞' : repeatTotal;
-        });
+        btn.addEventListener('click', () => setRepeat(parseInt(btn.dataset.val)));
     });
 
-    // 모드 선택
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            setMode(btn.dataset.mode);
-            if (isPlaying) startPlay();   // 재생 중이면 즉시 새 모드로 재시작
-        });
+    // 재생 구간
+    $modeSeg.addEventListener('click', e => {
+        const b = e.target.closest('.seg-btn');
+        if (!b || b.dataset.mode === mode) return;
+        setMode(b.dataset.mode);
+        if (isPlaying) startPlay();   // 재생 중이면 즉시 새 구간으로 재시작
     });
 
     // 프로그레스 클릭
@@ -1296,6 +1370,9 @@ function init() {
     document.documentElement.lang = lang;
     $langSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
     $genderSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.gender === gender));
+    setMode(mode);
+    setRepeat(repeatTotal);
+    updateSummary();
     renderTabs();
     selectWeek(0);
     setupEvents();
