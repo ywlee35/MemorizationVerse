@@ -165,7 +165,6 @@
             flex: 1;
             display: inline-flex;
             align-items: center;
-            gap: 7px;
             padding: 8px 16px;
             border-radius: 20px;
             border: 1px solid var(--accent-border);
@@ -188,22 +187,11 @@
             position: relative;
             overflow: hidden;
         }
-        .verse-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 3px;
-            background: var(--accent);
-            opacity: 0;
-            transition: opacity 0.3s;
-            border-radius: 18px 0 0 18px;
-        }
         .verse-card.playing {
-            border-color: var(--accent-border);
+            border-color: var(--accent);
             background: rgba(242,196,108,0.055);
             box-shadow: 0 0 28px var(--accent-glow), inset 0 0 20px rgba(242,196,108,0.03);
         }
-        .verse-card.playing::before { opacity: 1; }
 
         .card-header {
             display: flex;
@@ -529,7 +517,7 @@
     <!-- Header -->
     <div class="header">
         <div class="header-label">Sarang Community Church</div>
-        <h1>📖 새일꾼반 성경암송</h1>
+        <h1>새일꾼반 성경암송</h1>
 
         <!-- Language / Voice Selector -->
         <div class="voice-row">
@@ -917,7 +905,7 @@ function renderContent() {
     const w = WEEKS[week];
     $content.innerHTML = `
         <div class="theme-row">
-            <div class="theme-badge">✦ ${w.theme[lang]}</div>
+            <div class="theme-badge">${week+1}. ${w.theme[lang]}</div>
         </div>
         ${w.verses.map((v,i) => `
             <div class="verse-card" id="card-${i}">
