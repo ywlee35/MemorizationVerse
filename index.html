@@ -2,8 +2,21 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>새일꾼반 성경암송</title>
+    <meta name="description" content="사랑의교회 새일꾼반 성경 구절을 듣고 반복 재생하며 암송하는 앱">
+
+    <!-- 홈 화면에 추가했을 때 앱처럼 동작하도록 -->
+    <meta name="theme-color" content="#07090f">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+    <!-- iOS (Safari 는 manifest 를 일부만 따르므로 별도 지정) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="성경암송">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap');
 
@@ -51,6 +64,7 @@
         .header {
             flex-shrink: 0;
             padding: 16px 20px 12px;
+            padding-top: max(16px, env(safe-area-inset-top));
             background: rgba(7,9,15,0.9);
             border-bottom: 1px solid var(--border);
             text-align: center;
@@ -975,6 +989,7 @@ function applyVoiceChange() {
     if (wasPlaying) startPlay();
     else setStatus('', `${week+1}주차 · ${WEEKS[week].theme[lang]}`);
     savePref();
+    prefetchWeek(week);
 }
 
 function setLang(l) {
@@ -1017,6 +1032,7 @@ function stopAudio() {
     audio = null;
     isPlaying = false;
     $playBtn.innerHTML = ICON_PLAY;
+    setMediaState('none');
     $progFill.style.width = '0%';
     $curTime.textContent  = '0:00';
     $totTime.textContent  = '0:00';
@@ -1083,10 +1099,20 @@ function playNext() {
         if (card) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
     }
 
+    setMediaMetadata(track);
+    setMediaState('playing');
+
     loadPlay(
         src(week, track),
         () => { qIdx++; playNext(); },
-        () => setStatus('error', `음성 파일 없음: ${src(week, track)}`)
+        () => {
+            isPlaying = false;
+            $playBtn.innerHTML = ICON_PLAY;
+            setMediaState('paused');
+            setStatus('error', navigator.onLine
+                ? `음성 파일을 재생할 수 없습니다: ${src(week, track)}`
+                : '오프라인 상태입니다 — 아직 저장되지 않은 구절입니다');
+        }
     );
 }
 
@@ -1095,16 +1121,52 @@ function togglePlay() {
         if (audio) audio.pause();
         isPlaying = false;
         $playBtn.innerHTML = ICON_PLAY;
+        setMediaState('paused');
         setStatus('', '일시정지됨');
     } else if (audio && audio.src && !audio.ended) {
         audio.play().then(() => {
             isPlaying = true;
             $playBtn.innerHTML = ICON_PAUSE;
+            setMediaState('playing');
             updateStatus();
         }).catch(() => startPlay());
     } else {
         startPlay();
     }
+}
+
+// ═══════════════════════════════════════════════════════
+//  잠금화면 / 알림창 재생 정보 (MediaSession)
+// ═══════════════════════════════════════════════════════
+const hasMediaSession = 'mediaSession' in navigator;
+
+function setMediaMetadata(track) {
+    if (!hasMediaSession) return;
+    const w = WEEKS[week];
+    const heading = track === 1 ? w.theme[lang] : w.verses[track-2].ref[lang];
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title:  heading,
+        artist: `${week+1}. ${w.theme[lang]}`,
+        album:  lang === 'ko' ? '새일꾼반 성경암송' : 'Memory Verses',
+        artwork: [
+            { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
+        ],
+    });
+}
+
+function setMediaState(state) {
+    if (hasMediaSession) navigator.mediaSession.playbackState = state;
+}
+
+function setupMediaSession() {
+    if (!hasMediaSession) return;
+    const on = (a, fn) => { try { navigator.mediaSession.setActionHandler(a, fn); } catch {} };
+    on('play',  () => { if (!isPlaying) togglePlay(); });
+    on('pause', () => { if (isPlaying)  togglePlay(); });
+    on('previoustrack', () => { if (week > 0) selectWeek(week - 1); });
+    on('nexttrack',     () => { if (week < WEEKS.length - 1) selectWeek(week + 1); });
+    on('stop', stopAudio);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1122,6 +1184,19 @@ function setStatus(cls, msg) {
 }
 
 // ═══════════════════════════════════════════════════════
+//  오프라인 대비: 선택한 주차의 음성을 미리 받아 둔다
+//  (서비스워커가 가로채 저장하므로 여기서는 요청만 보낸다)
+// ═══════════════════════════════════════════════════════
+function prefetchWeek(w) {
+    if (!navigator.serviceWorker?.controller) return;   // 아직 설치 전
+    if (!navigator.onLine) return;
+    if (navigator.connection?.saveData) return;         // 데이터 절약 모드면 생략
+    for (const track of [1, 2, 3]) {
+        fetch(src(w, track), { credentials: 'omit' }).catch(() => {});
+    }
+}
+
+// ═══════════════════════════════════════════════════════
 //  주차 선택
 // ═══════════════════════════════════════════════════════
 function selectWeek(w) {
@@ -1133,6 +1208,7 @@ function selectWeek(w) {
     const tab = $weekTabs.children[w];
     if (tab) tab.scrollIntoView({ inline:'center', behavior:'smooth' });
     setStatus('', `${week+1}주차 · ${WEEKS[week].theme[lang]}`);
+    prefetchWeek(week);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1208,7 +1284,16 @@ function setupEvents() {
 // ═══════════════════════════════════════════════════════
 //  초기화
 // ═══════════════════════════════════════════════════════
+// 홈 화면 설치·오프라인 재생을 담당하는 서비스워커
+function registerSW() {
+    if (!('serviceWorker' in navigator)) return;
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
 function init() {
+    registerSW();
+    setupMediaSession();
     loadPref();
     document.documentElement.lang = lang;
     $langSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
