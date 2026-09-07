@@ -31,6 +31,11 @@ Audio/                              # 음성 파일 132개
 README.md                           # 이 파일
 ```
 
+> **구절 음성 구성**: 본문 → *(쉼)* → 장절
+> 장절은 **끝에서 한 번만** 낭독됩니다. 화면 상단에 장절이 이미 표시되므로
+> 앞쪽 낭독은 중복이라 제거했습니다.
+> 제목 음성은 주제만 낭독합니다.
+
 > **오디오 파일 명명 규칙**
 > - 제목: `T{주차 2자리}_{주제 영문}_{KO|EN}_{F|M}.mp3` — 11주차 × 4 = 44개
 > - 구절: `{구절번호 2자리}_{장절 슬러그}_{KO|EN}_{F|M}.mp3` — 22구절 × 4 = 88개
@@ -95,7 +100,7 @@ README.md                           # 이 파일
 
 - **기술**: HTML5, CSS3, JavaScript (순수 바닐라) — 단일 파일, 빌드 불필요
 - **외부 의존성**: Google Fonts (Noto Sans KR)
-- **음성**: ElevenLabs TTS, MP3 44.1kHz 128kbps (총 132개 · 약 27MB)
+- **음성**: ElevenLabs TTS, MP3 44.1kHz 128kbps (총 132개 · 약 22MB)
 - **설정 저장**: localStorage (`srcc-memoryverses-pref`)
 - **브라우저 호환성**: Chrome, Firefox, Safari, Edge 최신 버전
 - **모바일**: 반응형 디자인, 터치 최적화, Safe Area 지원
