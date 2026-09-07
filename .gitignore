@@ -23,3 +23,7 @@ logs/
 # 일시 파일
 *.tmp
 .temp/
+
+# 제작 자료 (API 키 · 원본 문서 · TTS 원본 출력)
+# Docs/API.txt 에 ElevenLabs API 키가 들어 있으므로 절대 커밋하지 말 것
+Docs/

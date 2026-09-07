@@ -72,6 +72,43 @@
             letter-spacing: -0.02em;
         }
 
+        /* ── Language / Voice Selector ──────────────── */
+        .voice-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 11px;
+        }
+        .seg {
+            flex: 1;
+            display: flex;
+            gap: 3px;
+            padding: 3px;
+            border-radius: 12px;
+            border: 1px solid var(--border2);
+            background: var(--surface);
+        }
+        .seg-btn {
+            flex: 1;
+            padding: 6px 0;
+            border: none;
+            border-radius: 9px;
+            background: transparent;
+            color: var(--text2);
+            font-size: 0.76rem;
+            font-weight: 600;
+            font-family: inherit;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .seg-btn.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            box-shadow: inset 0 0 0 1px var(--accent-border);
+        }
+        .seg-btn:active { transform: scale(0.95); }
+
         /* ── Week Tabs ──────────────────────────────── */
         .week-tabs {
             flex-shrink: 0;
@@ -222,6 +259,10 @@
             color: #c8d4e8;
             word-break: keep-all;
             font-weight: 400;
+        }
+        .verse-text.en {
+            line-height: 1.8;
+            letter-spacing: -0.005em;
         }
         .verse-card.playing .verse-text {
             color: var(--text1);
@@ -489,6 +530,18 @@
     <div class="header">
         <div class="header-label">Sarang Community Church</div>
         <h1>📖 새일꾼반 성경암송</h1>
+
+        <!-- Language / Voice Selector -->
+        <div class="voice-row">
+            <div class="seg" id="langSeg">
+                <button class="seg-btn active" data-lang="ko">한국어</button>
+                <button class="seg-btn"        data-lang="en">English</button>
+            </div>
+            <div class="seg" id="genderSeg">
+                <button class="seg-btn active" data-gender="F">여성</button>
+                <button class="seg-btn"        data-gender="M">남성</button>
+            </div>
+        </div>
     </div>
 
     <!-- Week Tabs -->
@@ -580,98 +633,223 @@ const ICON_PAUSE = `<svg width="26" height="26" viewBox="0 0 24 24" fill="curren
 // ═══════════════════════════════════════════════════════
 const WEEKS = [
     {
-        theme: "중심되신 그리스도",
+        theme:     { ko: "중심되신 그리스도", en: "Christ the Center" },
+        titleBase: "T01_Christ_the_Center",
         verses: [
-            { ref: "갈라디아서 2:20",  text: "내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 사는 것이 아니요 오직 내 안에 그리스도께서 사시는 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 자신을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라" },
-            { ref: "요한복음 15:5",    text: "나는 포도나무요 너희는 가지라 그가 내 안에, 내가 그 안에 거하면 사람이 열매를 많이 맺나니 나를 떠나서는 너희가 아무 것도 할 수 없음이라" }
+            {
+                base: "01_Gal_2-20",
+                ref:  { ko: "갈라디아서 2:20", en: "Galatians 2:20" },
+                text: { ko: "내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 사는 것이 아니요 오직 내 안에 그리스도께서 사시는 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 자신을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라",
+                        en: "I have been crucified with Christ. It is no longer I who live, but Christ who lives in me. And the life I now live in the flesh I live by faith in the Son of God, who loved me and gave himself for me." }
+            },
+            {
+                base: "02_John_15-5",
+                ref:  { ko: "요한복음 15:5", en: "John 15:5" },
+                text: { ko: "나는 포도나무요 너희는 가지라 그가 내 안에, 내가 그 안에 거하면 사람이 열매를 많이 맺나니 나를 떠나서는 너희가 아무 것도 할 수 없음이라",
+                        en: "I am the vine; you are the branches. Whoever abides in me and I in him, he it is that bears much fruit, for apart from me you can do nothing." }
+            }
         ]
     },
     {
-        theme: "구원의 확신",
+        theme:     { ko: "구원의 확신", en: "Assurance of Salvation" },
+        titleBase: "T02_Assurance_of_Salvation",
         verses: [
-            { ref: "요한일서 5:13",    text: "내가 하나님의 아들의 이름을 믿는 너희에게 이것을 쓰는 것은 너희로 하여금 너희에게 영생이 있음을 알게 하려 함이라" },
-            { ref: "요한복음 5:24",    text: "내가 진실로 진실로 너희에게 이르노니 내 말을 듣고 또 나를 보내신 이를 믿는 자는 영생을 얻었고 심판에 이르지 아니하나니 사망에서 생명으로 옮겼느니라" }
+            {
+                base: "03_1John_5-13",
+                ref:  { ko: "요한일서 5:13", en: "1 John 5:13" },
+                text: { ko: "내가 하나님의 아들의 이름을 믿는 너희에게 이것을 쓰는 것은 너희로 하여금 너희에게 영생이 있음을 알게 하려 함이라",
+                        en: "I write these things to you who believe in the name of the Son of God, that you may know that you have eternal life." }
+            },
+            {
+                base: "04_John_5-24",
+                ref:  { ko: "요한복음 5:24", en: "John 5:24" },
+                text: { ko: "내가 진실로 진실로 너희에게 이르노니 내 말을 듣고 또 나 보내신 이를 믿는 자는 영생을 얻었고 심판에 이르지 아니하나니 사망에서 생명으로 옮겼느니라",
+                        en: "Truly, truly, I say to you, whoever hears my word and believes him who sent me has eternal life. He does not come into judgment, but has passed from death to life." }
+            }
         ]
     },
     {
-        theme: "하나님의 속성",
+        theme:     { ko: "하나님의 속성", en: "The Attributes of God" },
+        titleBase: "T03_The_Attributes_of_God",
         verses: [
-            { ref: "역대상 29:11",     text: "여호와여 위대하심과 권능과 영광과 승리와 위엄이 다 주께 속하였사오니 천지에 있는 것이 다 주의 것이로소이다 여호와여 주권도 주께 속하였사오니 주는 높으사 만물의 머리이심이니이다" },
-            { ref: "시편 36:5-6",      text: "여호와여 주의 인자하심이 하늘에 있고 주의 진실하심이 공중에 사무쳤으며 주의 의는 하나님의 산들과 같고 주의 심판은 큰 바다와 같으니이다 여호와여 주는 사람과 짐승을 구하여 주시나이다" }
+            {
+                base: "05_1Chr_29-11",
+                ref:  { ko: "역대상 29:11", en: "1 Chronicles 29:11" },
+                text: { ko: "여호와여 위대하심과 권능과 영광과 승리와 위엄이 다 주께 속하였사오니 천지에 있는 것이 다 주의 것이로소이다 여호와여 주권도 주께 속하였사오니 주는 높으사 만물의 머리이심이니이다",
+                        en: "Yours, O Lord, is the greatness and the power and the glory and the victory and the majesty, for all that is in the heavens and in the earth is yours. Yours is the kingdom, O Lord, and you are exalted as head above all." }
+            },
+            {
+                base: "06_Ps_36-5-6",
+                ref:  { ko: "시편 36:5-6", en: "Psalm 36:5-6" },
+                text: { ko: "여호와여 주의 인자하심이 하늘에 있고 주의 진실하심이 공중에 사무쳤으며, 주의 의는 하나님의 산들과 같고 주의 심판은 큰 바다와 같으니이다 여호와여 주는 사람과 짐승을 구하여 주시나이다",
+                        en: "Your steadfast love, O Lord, extends to the heavens, your faithfulness to the clouds. Your righteousness is like the mountains of God; your judgments are like the great deep; man and beast you save, O Lord." }
+            }
         ]
     },
     {
-        theme: "성경",
+        theme:     { ko: "성경", en: "The Word" },
+        titleBase: "T04_The_Word",
         verses: [
-            { ref: "디모데후서 3:16-17", text: "모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니 이는 하나님의 사람으로 온전하게 하며 모든 선한 일을 행할 능력을 갖추게 하려 함이라" },
-            { ref: "베드로전서 2:2",   text: "갓난 아기들 같이 순전하고 신령한 젖을 사모하라 이는 그로 말미암아 너희로 구원에 이르도록 자라게 하려 함이라" }
+            {
+                base: "07_2Tim_3-16-17",
+                ref:  { ko: "디모데후서 3:16-17", en: "2 Timothy 3:16-17" },
+                text: { ko: "모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니, 이는 하나님의 사람으로 온전하게 하며 모든 선한 일을 행할 능력을 갖추게 하려 함이라",
+                        en: "All Scripture is breathed out by God and profitable for teaching, for reproof, for correction, and for training in righteousness, that the man of God may be complete, equipped for every good work." }
+            },
+            {
+                base: "08_1Pet_2-2",
+                ref:  { ko: "베드로전서 2:2", en: "1 Peter 2:2" },
+                text: { ko: "갓난 아기들 같이 순전하고 신령한 젖을 사모하라 이는 그로 말미암아 너희로 구원에 이르도록 자라게 하려 함이라",
+                        en: "Like newborn infants, long for the pure spiritual milk, that by it you may grow up into salvation." }
+            }
         ]
     },
     {
-        theme: "기도",
+        theme:     { ko: "기도", en: "Prayer" },
+        titleBase: "T05_Prayer",
         verses: [
-            { ref: "요한복음 15:7",    text: "너희가 내 안에 거하고 내 말이 너희 안에 거하면 무엇이든지 원하는 대로 구하라 그리하면 이루리라" },
-            { ref: "빌립보서 4:6-7",   text: "아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라" }
+            {
+                base: "09_John_15-7",
+                ref:  { ko: "요한복음 15:7", en: "John 15:7" },
+                text: { ko: "너희가 내 안에 거하고 내 말이 너희 안에 거하면 무엇이든지 원하는 대로 구하라 그리하면 이루리라",
+                        en: "If you abide in me, and my words abide in you, ask whatever you wish, and it will be done for you." }
+            },
+            {
+                base: "10_Phil_4-6-7",
+                ref:  { ko: "빌립보서 4:6-7", en: "Philippians 4:6-7" },
+                text: { ko: "아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라. 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라",
+                        en: "Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God. And the peace of God, which surpasses all understanding, will guard your hearts and your minds in Christ Jesus." }
+            }
         ]
     },
     {
-        theme: "교제",
+        theme:     { ko: "교제", en: "Fellowship" },
+        titleBase: "T06_Fellowship",
         verses: [
-            { ref: "로마서 12:4-5",    text: "우리가 한 몸에 많은 지체를 가졌으나 모든 지체가 같은 기능을 가진 것이 아니니 이와 같이 우리 많은 사람이 그리스도 안에서 한 몸이 되어 서로 지체가 되었느니라" },
-            { ref: "요한복음 13:34-35", text: "새 계명을 너희에게 주노니 서로 사랑하라 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라 너희가 서로 사랑하면 이로써 모든 사람이 너희가 내 제자인 줄 알리라" }
+            {
+                base: "11_Rom_12-4-5",
+                ref:  { ko: "로마서 12:4-5", en: "Romans 12:4-5" },
+                text: { ko: "우리가 한 몸에 많은 지체를 가졌으나 모든 지체가 같은 기능을 가진 것이 아니니, 이와 같이 우리 많은 사람이 그리스도 안에서 한 몸이 되어 서로 지체가 되었느니라",
+                        en: "For as in one body we have many members, and the members do not all have the same function, so we, though many, are one body in Christ, and individually members one of another." }
+            },
+            {
+                base: "12_John_13-34-35",
+                ref:  { ko: "요한복음 13:34-35", en: "John 13:34-35" },
+                text: { ko: "새 계명을 너희에게 주노니 서로 사랑하라 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라. 너희가 서로 사랑하면 이로써 모든 사람이 너희가 내 제자인 줄 알리라",
+                        en: "A new commandment I give to you, that you love one another: just as I have loved you, you also are to love one another. By this all people will know that you are my disciples, if you have love for one another." }
+            }
         ]
     },
     {
-        theme: "전도",
+        theme:     { ko: "전도", en: "Witnessing" },
+        titleBase: "T07_Witnessing",
         verses: [
-            { ref: "로마서 1:16",      text: "내가 복음을 부끄러워하지 아니하노니 이 복음은 모든 믿는 자에게 구원을 주시는 하나님의 능력이 됨이라 먼저는 유대인에게요 그리고 헬라인에게로다" },
-            { ref: "베드로전서 3:15",  text: "너희 마음에 그리스도를 주로 삼아 거룩하게 하고 너희 속에 있는 소망에 관한 이유를 묻는 자에게는 대답할 것을 항상 준비하되 온유와 두려움으로 하고" }
+            {
+                base: "13_Rom_1-16",
+                ref:  { ko: "로마서 1:16", en: "Romans 1:16" },
+                text: { ko: "내가 복음을 부끄러워하지 아니하노니 이 복음은 모든 믿는 자에게 구원을 주시는 하나님의 능력이 됨이라 먼저는 유대인에게요 그리고 헬라인에게로다",
+                        en: "For I am not ashamed of the gospel, for it is the power of God for salvation to everyone who believes, to the Jew first and also to the Greek." }
+            },
+            {
+                base: "14_1Pet_3-15",
+                ref:  { ko: "베드로전서 3:15", en: "1 Peter 3:15" },
+                text: { ko: "너희 마음에 그리스도를 주로 삼아 거룩하게 하고 너희 속에 있는 소망에 관한 이유를 묻는 자에게는 대답할 것을 항상 준비하되 온유와 두려움으로 하고",
+                        en: "But in your hearts honor Christ the Lord as holy, always being prepared to make a defense to anyone who asks you for a reason for the hope that is in you; yet do it with gentleness and respect." }
+            }
         ]
     },
     {
-        theme: "성령충만한 삶",
+        theme:     { ko: "성령충만한 삶", en: "The Spirit-filled Life" },
+        titleBase: "T08_The_Spirit_filled_Life",
         verses: [
-            { ref: "에베소서 5:18",    text: "술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라" },
-            { ref: "갈라디아서 5:22-23", text: "오직 성령의 열매는 사랑과 희락과 화평과 오래 참음과 자비와 양선과 충성과 온유와 절제니 이같은 것을 금지할 법이 없느니라" }
+            {
+                base: "15_Eph_5-18",
+                ref:  { ko: "에베소서 5:18", en: "Ephesians 5:18" },
+                text: { ko: "술 취하지 말라 이는 방탕한 것이니 오직 성령으로 충만함을 받으라",
+                        en: "And do not get drunk with wine, for that is debauchery, but be filled with the Spirit." }
+            },
+            {
+                base: "16_Gal_5-22-23",
+                ref:  { ko: "갈라디아서 5:22-23", en: "Galatians 5:22-23" },
+                text: { ko: "오직 성령의 열매는 사랑과 희락과 화평과 오래 참음과 자비와 양선과 충성과, 온유와 절제니 이같은 것을 금지할 법이 없느니라",
+                        en: "But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control; against such things there is no law." }
+            }
         ]
     },
     {
-        theme: "시험을 이기는 삶",
+        theme:     { ko: "시험을 이기는 삶", en: "Overcoming Temptation" },
+        titleBase: "T09_Overcoming_Temptation",
         verses: [
-            { ref: "고린도전서 10:13", text: "사람이 감당할 시험 밖에는 너희가 당한 것이 없나니 오직 미쁘사 너희가 감당하지 못할 시험 당함을 허락하지 아니하시고 시험 당할 즈음에 또한 피할 길을 내사 너희로 능히 감당하게 하시느니라" },
-            { ref: "야고보서 1:14-15", text: "오직 각 사람이 시험을 받는 것은 자기 욕심에 끌려 미혹됨이니 욕심이 잉태한즉 죄를 낳고 죄가 장성한즉 사망을 낳느니라" }
+            {
+                base: "17_1Cor_10-13",
+                ref:  { ko: "고린도전서 10:13", en: "1 Corinthians 10:13" },
+                text: { ko: "사람이 감당할 시험 밖에는 너희가 당한 것이 없나니 오직 하나님은 미쁘사 너희가 감당하지 못할 시험 당함을 허락하지 아니하시고 시험 당할 즈음에 또한 피할 길을 내사 너희로 능히 감당하게 하시느니라",
+                        en: "No temptation has overtaken you that is not common to man. God is faithful, and he will not let you be tempted beyond your ability, but with the temptation he will also provide the way of escape, that you may be able to endure it." }
+            },
+            {
+                base: "18_Jas_1-14-15",
+                ref:  { ko: "야고보서 1:14-15", en: "James 1:14-15" },
+                text: { ko: "오직 각 사람이 시험을 받는 것은 자기 욕심에 끌려 미혹됨이니, 욕심이 잉태한즉 죄를 낳고 죄가 장성한즉 사망을 낳느니라",
+                        en: "But each person is tempted when he is lured and enticed by his own desire. Then desire when it has conceived gives birth to sin, and sin when it is fully grown brings forth death." }
+            }
         ]
     },
     {
-        theme: "순종하는 삶",
+        theme:     { ko: "순종하는 삶", en: "Obedience" },
+        titleBase: "T10_Obedience",
         verses: [
-            { ref: "로마서 12:1",      text: "그러므로 형제들아 내가 하나님의 모든 자비하심으로 너희를 권하노니 너희 몸을 하나님이 기뻐하시는 거룩한 산 제물로 드리라 이는 너희가 드릴 영적 예배니라" },
-            { ref: "누가복음 9:23",    text: "또 무리에게 이르시되 아무든지 나를 따라오려거든 자기를 부인하고 날마다 제 십자가를 지고 나를 따를 것이니라" }
+            {
+                base: "19_Rom_12-1",
+                ref:  { ko: "로마서 12:1", en: "Romans 12:1" },
+                text: { ko: "그러므로 형제들아 내가 하나님의 모든 자비하심으로 너희를 권하노니 너희 몸을 하나님이 기뻐하시는 거룩한 산 제물로 드리라 이는 너희가 드릴 영적 예배니라",
+                        en: "I appeal to you therefore, brothers, by the mercies of God, to present your bodies as a living sacrifice, holy and acceptable to God, which is your spiritual worship." }
+            },
+            {
+                base: "20_Luke_9-23",
+                ref:  { ko: "누가복음 9:23", en: "Luke 9:23" },
+                text: { ko: "또 무리에게 이르시되 아무든지 나를 따라오려거든 자기를 부인하고 날마다 제 십자가를 지고 나를 따를 것이니라",
+                        en: "And he said to all, \"If anyone would come after me, let him deny himself and take up his cross daily and follow me.\"" }
+            }
         ]
     },
     {
-        theme: "사역하는 삶",
+        theme:     { ko: "사역하는 삶", en: "Ministry" },
+        titleBase: "T11_Ministry",
         verses: [
-            { ref: "베드로전서 2:9",   text: "그러나 너희는 택하신 족속이요 왕 같은 제사장들이요 거룩한 나라요 그의 소유가 된 백성이니 이는 너희를 어두운데서 불러 내어 그의 기이한 빛에 들어가게 하신 이의 아름다운 덕을 선포하게 하려 하심이라" },
-            { ref: "고린도전서 3:9",   text: "우리는 하나님의 동역자들이요 너희는 하나님의 밭이요 하나님의 집이니라" }
+            {
+                base: "21_1Pet_2-9",
+                ref:  { ko: "베드로전서 2:9", en: "1 Peter 2:9" },
+                text: { ko: "그러나 너희는 택하신 족속이요 왕 같은 제사장들이요 거룩한 나라요 그의 소유가 된 백성이니 이는 너희를 어두운 데서 불러 내어 그의 기이한 빛에 들어가게 하신 이의 아름다운 덕을 선포하게 하려 하심이라",
+                        en: "But you are a chosen race, a royal priesthood, a holy nation, a people for his own possession, that you may proclaim the excellencies of him who called you out of darkness into his marvelous light." }
+            },
+            {
+                base: "22_1Cor_3-9",
+                ref:  { ko: "고린도전서 3:9", en: "1 Corinthians 3:9" },
+                text: { ko: "우리는 하나님의 동역자들이요 너희는 하나님의 밭이요 하나님의 집이니라",
+                        en: "For we are God's fellow workers. You are God's field, God's building." }
+            }
         ]
     }
 ];
 
 // ═══════════════════════════════════════════════════════
 //  오디오 경로 헬퍼
-//  Audio/01_1.mp3 = 1주 제목
-//  Audio/01_2.mp3 = 1주 1절
-//  Audio/01_3.mp3 = 1주 2절
+//  Audio/{베이스}_{KO|EN}_{F|M}.mp3
+//    제목 → Audio/T01_Christ_the_Center_KO_F.mp3
+//    구절 → Audio/01_Gal_2-20_KO_F.mp3
 // ═══════════════════════════════════════════════════════
 function src(weekIdx, track) {  // track: 1=제목, 2=1절, 3=2절
-    return `Audio/${String(weekIdx+1).padStart(2,'0')}_${track}.mp3`;
+    const w = WEEKS[weekIdx];
+    const base = track === 1 ? w.titleBase : w.verses[track-2].base;
+    return `Audio/${base}_${lang.toUpperCase()}_${gender}.mp3`;
 }
 
 // ═══════════════════════════════════════════════════════
 //  상태
 // ═══════════════════════════════════════════════════════
 let week        = 0;          // 현재 주차 인덱스
+let lang        = 'ko';       // 'ko' | 'en'  — 음성 + 화면 텍스트
+let gender      = 'F';        // 'F' | 'M'    — 음성 성별
 let mode        = 'v1';       // 'v1' | 'v2' | 'all'
 let repeatTotal = 0;          // 반복 횟수 (0 = 무한)
 let repeatNow   = 0;          // 현재 반복 회차
@@ -699,6 +877,8 @@ const $progTrack = document.getElementById('progressTrack');
 const $progFill  = document.getElementById('progressFill');
 const $curTime   = document.getElementById('curTime');
 const $totTime   = document.getElementById('totTime');
+const $langSeg   = document.getElementById('langSeg');
+const $genderSeg = document.getElementById('genderSeg');
 const $overlay   = document.getElementById('overlay');
 const $sheetClose = document.getElementById('sheetClose');
 
@@ -737,17 +917,17 @@ function renderContent() {
     const w = WEEKS[week];
     $content.innerHTML = `
         <div class="theme-row">
-            <div class="theme-badge">✦ ${w.theme}</div>
+            <div class="theme-badge">✦ ${w.theme[lang]}</div>
         </div>
         ${w.verses.map((v,i) => `
             <div class="verse-card" id="card-${i}">
                 <div class="card-header">
                     <div class="card-meta">
-                        <span class="verse-ref">${v.ref}</span>
+                        <span class="verse-ref">${v.ref[lang]}</span>
                     </div>
                     <button class="card-play-btn" id="cpbtn-${i}" aria-label="${i+1}절 재생"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg></button>
                 </div>
-                <div class="verse-text">${v.text}</div>
+                <div class="verse-text${lang === 'en' ? ' en' : ''}" lang="${lang}">${v.text[lang]}</div>
             </div>
         `).join('')}
     `;
@@ -782,6 +962,47 @@ function setCardPlaying(verseIdx) {
 }
 
 function clearCards() { setCardPlaying(null); }
+
+// ═══════════════════════════════════════════════════════
+//  언어 / 음성
+// ═══════════════════════════════════════════════════════
+const PREF_KEY = 'srcc-memoryverses-pref';
+
+function savePref() {
+    try { localStorage.setItem(PREF_KEY, JSON.stringify({ lang, gender })); } catch {}
+}
+function loadPref() {
+    try {
+        const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+        if (p.lang === 'ko' || p.lang === 'en')   lang   = p.lang;
+        if (p.gender === 'F' || p.gender === 'M') gender = p.gender;
+    } catch {}
+}
+
+// 선택 변경 시: 화면 텍스트를 다시 그리고, 재생 중이면 새 음성으로 재시작
+function applyVoiceChange() {
+    const wasPlaying = isPlaying;
+    if (wasPlaying) stopAudio();
+    renderContent();
+    if (wasPlaying) startPlay();
+    else setStatus('', `${week+1}주차 · ${WEEKS[week].theme[lang]}`);
+    savePref();
+}
+
+function setLang(l) {
+    if (l === lang) return;
+    lang = l;
+    document.documentElement.lang = l;
+    $langSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+    applyVoiceChange();
+}
+
+function setGender(g) {
+    if (g === gender) return;
+    gender = g;
+    $genderSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.gender === g));
+    applyVoiceChange();
+}
 
 // ═══════════════════════════════════════════════════════
 //  모드
@@ -923,7 +1144,7 @@ function selectWeek(w) {
     // 탭 스크롤
     const tab = $weekTabs.children[w];
     if (tab) tab.scrollIntoView({ inline:'center', behavior:'smooth' });
-    setStatus('', `${week+1}주차 · ${WEEKS[week].theme}`);
+    setStatus('', `${week+1}주차 · ${WEEKS[week].theme[lang]}`);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -934,6 +1155,18 @@ function setupEvents() {
     $weekTabs.addEventListener('click', e => {
         if (e.target.classList.contains('wtab'))
             selectWeek(parseInt(e.target.dataset.w));
+    });
+
+    // 언어 선택
+    $langSeg.addEventListener('click', e => {
+        const b = e.target.closest('.seg-btn');
+        if (b) setLang(b.dataset.lang);
+    });
+
+    // 음성 성별 선택
+    $genderSeg.addEventListener('click', e => {
+        const b = e.target.closest('.seg-btn');
+        if (b) setGender(b.dataset.gender);
     });
 
     // 재생 / 일시정지
@@ -988,6 +1221,10 @@ function setupEvents() {
 //  초기화
 // ═══════════════════════════════════════════════════════
 function init() {
+    loadPref();
+    document.documentElement.lang = lang;
+    $langSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    $genderSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.gender === gender));
     renderTabs();
     selectWeek(0);
     setupEvents();
