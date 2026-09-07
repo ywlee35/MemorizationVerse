@@ -29,6 +29,7 @@ icon-192.png                        # 앱 아이콘
 icon-512.png
 icon-maskable-512.png               # 안드로이드 적응형 아이콘
 apple-touch-icon.png                # iOS 홈 화면 아이콘
+logo_Sarang.png                     # 앱 상단 교회 로고
 Audio/                              # 음성 파일 132개
   T01_Christ_the_Center_KO_F.mp3    # 1주차 주제 · 한국어 여성
   T01_Christ_the_Center_KO_M.mp3    # 1주차 주제 · 한국어 남성

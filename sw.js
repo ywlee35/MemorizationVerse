@@ -9,7 +9,7 @@
  *  음성 캐시(AUDIO)는 파일명이 바뀌지 않는 한 그대로 유지합니다.
  */
 
-const SHELL_VER = 'v1';
+const SHELL_VER = 'v2';   // 아이콘 교체·로고 추가로 갱신
 const SHELL = `mv-shell-${SHELL_VER}`;
 const AUDIO = 'mv-audio-v1';
 const FONT  = 'mv-font-v1';
@@ -22,6 +22,7 @@ const SHELL_FILES = [
   './icon-512.png',
   './icon-maskable-512.png',
   './apple-touch-icon.png',
+  './logo_Sarang.png',
 ];
 
 self.addEventListener('install', (e) => {
